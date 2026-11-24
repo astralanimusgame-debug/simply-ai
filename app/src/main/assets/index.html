@@ -589,6 +589,14 @@ es: [["same", "el chat con tu juego"], ["same", "el chat con tu web"], ["new"], 
 };
 for (const l of Object.keys(C)) { Object.assign(C[l].ui, EXTRA3[l]); C[l].L.forEach((les, i) => { les.task.bk = BK[l][i][0]; les.task.bw = BK[l][i][1] || ""; }); C[l].L[0].chatInfo = true; }
 
+/* v4: real Google sign-in texts */
+const EXTRA4 = {
+ru: { signedReal: "Вход через Google", loginErr: "Не получилось войти. Проверьте интернет и попробуйте ещё раз." },
+en: { signedReal: "Signed in with Google", loginErr: "Couldn’t sign in. Check your connection and try again." },
+es: { signedReal: "Has entrado con Google", loginErr: "No se pudo entrar. Revisa la conexión e inténtalo de nuevo." }
+};
+for (const l of Object.keys(C)) Object.assign(C[l].ui, EXTRA4[l]);
+
 {
 const LANGS = [["ru", "Русский"], ["en", "English"], ["es", "Español"]];
 const KEY = "simplyai.v2";
@@ -675,6 +683,24 @@ window.appBack = back;
 
 /* ---------- helpers ---------- */
 function toast(m) { toastEl.textContent = m; toastEl.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => toastEl.classList.remove("on"), 2200); }
+/* real Google sign-in inside the Android app; demo sheet in a browser */
+const nativeGoogle = () => { try { return !!(window.AndroidBridge && window.AndroidBridge.hasGoogle && window.AndroidBridge.hasGoogle()); } catch (e) { return false; } };
+let pendingThen = "";
+function startLogin(then) {
+  if (nativeGoogle()) { pendingThen = then || ""; try { window.AndroidBridge.signIn(); } catch (e) { toast(U().loginErr); } return; }
+  sheet = { kind: "login", then: then || "" }; renderSheet();
+}
+function afterLogin(then) {
+  sheet = (then === "life" || then === "job") ? { kind: "pay", k: then } : null;
+  if (then === "onb") S.onb = 1;
+  save(); render(); if (then === "onb") window.scrollTo(0, 0); toast(U().welcome + S.user);
+}
+window.onGoogleSignIn = o => {
+  const email = String((o && o.email) || ""), name = String((o && o.name) || "").trim() || email.split("@")[0] || "Google";
+  S.user = name.slice(0, 40); S.email = email.slice(0, 80); S.google = true;
+  const then = pendingThen; pendingThen = ""; afterLogin(then);
+};
+window.onGoogleSignInError = code => { pendingThen = ""; if (code !== "cancelled") toast(U().loginErr); };
 function copyText(txt) {
   const ok = () => toast(U().copied + " ✓"), fail = () => toast(U().copyFail);
   try { if (window.AndroidBridge && window.AndroidBridge.copy) { window.AndroidBridge.copy(txt); ok(); return; } } catch (e) {}
@@ -834,7 +860,7 @@ function pageCourse() {
 function pageProfile() {
   const u = U(), buys = (S.paid ? 1 : 0) + Object.keys(S.jobs).length;
   const jobName = S.job === -1 ? u.jobNone : (S.job !== null && cc().jobs[S.job] ? cc().jobs[S.job][0] : u.noJob);
-  return topBar() + `<div class="pg"><div class="box"><div class="prof"><span class="ava">${esc(S.user ? S.user.trim().charAt(0).toUpperCase() : "?")}</span><div><b style="font-size:18px">${esc(S.user || u.guest)}</b><br><span class="lbl">${esc(S.user ? u.signedSub : u.guestSub)}</span></div></div>
+  return topBar() + `<div class="pg"><div class="box"><div class="prof"><span class="ava">${esc(S.user ? S.user.trim().charAt(0).toUpperCase() : "?")}</span><div><b style="font-size:18px">${esc(S.user || u.guest)}</b><br><span class="lbl">${esc(S.user ? (S.google ? (S.email || u.signedReal) : u.signedSub) : u.guestSub)}</span></div></div>
   ${S.user ? `<button class="btn alt sm" data-act="logout">${esc(u.logout)}</button>` : `<button class="btn cob" data-act="login"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>`}</div>
   <div class="box"><div class="sp" style="align-items:center"><div><b>${esc(u.profJob)}</b><br><span class="lbl">${esc(jobName)}</span></div><button class="btn alt sm" data-act="go" data-p="job">${esc(u.change)}</button></div></div>
   <div class="box"><b>${esc(u.langT)}</b><div class="chips">${LANGS.map(l => chip(l[1], S.lang === l[0], `data-act="lang" data-l="${l[0]}"`)).join("")}</div></div>
@@ -902,19 +928,17 @@ function act(a, d, e) {
     case "tab": S.tab = d.t; save(); render(); break;
     case "mod": S.open = S.open === +d.o ? -1 : +d.o; save(); render(); break;
     case "job": S.job = +d.o; save(); render(); break;
-    case "buy": sheet = S.user ? { kind: "pay", k: d.k } : { kind: "login", then: d.k }; renderSheet(); break;
-    case "login": sheet = { kind: "login", then: d.then || "" }; renderSheet(); break;
-    case "logout": S.user = null; save(); render(); break;
+    case "buy": if (S.user) { sheet = { kind: "pay", k: d.k }; renderSheet(); } else startLogin(d.k); break;
+    case "login": startLogin(d.then); break;
+    case "logout": if (S.google) { try { window.AndroidBridge.signOut(); } catch (e) {} } S.user = null; S.email = ""; S.google = false; save(); render(); break;
     case "reset": S.stars = {}; S.paid = false; S.jobs = {}; S.tasks = {}; S.pos = {}; S.lastLes = null; T = {}; save(); render(); toast(U().resetDone); break;
     case "bg": if (e.target === e.currentTarget) { sheet = null; renderSheet(); } break;
     case "close": sheet = null; renderSheet(); break;
     case "doLogin": {
       const inp = document.getElementById("lgN"), nm = inp ? inp.value.trim() : "";
       if (!nm) { if (inp) inp.focus(); return; }
-      S.user = nm.slice(0, 40);
-      const then = sheet && sheet.then; sheet = (then === "life" || then === "job") ? { kind: "pay", k: then } : null;
-      if (then === "onb") S.onb = 1;
-      save(); render(); if (then === "onb") window.scrollTo(0, 0); toast(U().welcome + S.user); break;
+      S.user = nm.slice(0, 40); S.google = false;
+      afterLogin(sheet && sheet.then); break;
     }
     case "doPay": if (sheet.k === "life") S.paid = true; else S.jobs[jobIdx()] = true; save(); sheet = null; render(); toast(U().unlocked); break;
   }
