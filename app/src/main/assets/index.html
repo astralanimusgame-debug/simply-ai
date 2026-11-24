@@ -124,6 +124,10 @@ input{width:100%;min-height:48px;border:2px solid var(--line);border-radius:14px
 .g{flex:none;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--cob);display:grid;place-items:center;font-weight:800;font-size:14px}
 .btn[disabled]{opacity:.45;cursor:default}
 .two .btn.alt{flex:none}
+.kind{align-self:flex-start;background:#E6E8F5;color:#17142B;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.kind.same{background:#2340E8;color:#fff}
+.how.sm{font-size:15px;color:#17142B}
+.lost{border-top:2px dashed #E6E8F5;padding-top:10px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:#5B5670}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -559,6 +563,32 @@ es: ["Añade música y un nivel con jefe final.", "Añade una sección de opinio
 };
 for (const l of Object.keys(C)) { Object.assign(C[l].ui, EXTRA[l]); C[l].L.forEach((les, i) => { les.task.bp = BP[l][i]; }); }
 
+/* v3: what a chat is; bonus = continue in the same chat, or a new conversation */
+const EXTRA3 = {
+ru: { open: "Открыть новый чат в Claude", sameT: "Продолжение — в том же чате", newT: "Новый разговор",
+  sameSteps: ["Откройте Claude", "Нажмите ≡ слева вверху и выберите {w}", "Вставьте сообщение и отправьте"],
+  lost: "Чат потерялся? Не страшно — скопируйте всё целиком и отправьте в новый чат.", copyAll: "Скопировать всё целиком",
+  chatT: "Что такое чат?", chatB: "Каждый разговор с Claude — отдельный чат, как отдельная тетрадка. Claude помнит всё, что было в этом чате, но не видит другие. Продолжаете тему — пишите в тот же чат. Новая тема — новый чат.",
+  chatN: "«Написала „добавь босса“ в новый чат — он спросил, какого босса. Мой начальник тоже бы не понял».", chatA: "Чат: игра", chatZ: "Чат: рецепт" },
+en: { open: "Open a new chat in Claude", sameT: "Continuation — in the same chat", newT: "New conversation",
+  sameSteps: ["Open Claude", "Tap ≡ at the top left and pick {w}", "Paste the message and send"],
+  lost: "Lost the chat? No problem — copy everything at once and send it to a new chat.", copyAll: "Copy everything at once",
+  chatT: "What is a chat?", chatB: "Every conversation with Claude is a separate chat, like a separate notebook. Claude remembers everything in that chat but can’t see the others. Continuing a topic? Write in the same chat. New topic — new chat.",
+  chatN: "“I wrote ‘add a boss’ in a new chat and it asked which boss. My manager wouldn’t have known either.”", chatA: "Chat: game", chatZ: "Chat: recipe" },
+es: { open: "Abrir un chat nuevo en Claude", sameT: "Continuación — en el mismo chat", newT: "Conversación nueva",
+  sameSteps: ["Abre Claude", "Toca ≡ arriba a la izquierda y elige {w}", "Pega el mensaje y envíalo"],
+  lost: "¿Perdiste el chat? No pasa nada: copia todo junto y envíalo a un chat nuevo.", copyAll: "Copiar todo junto",
+  chatT: "¿Qué es un chat?", chatB: "Cada conversación con Claude es un chat aparte, como un cuaderno distinto. Claude recuerda todo lo de ese chat, pero no ve los demás. ¿Sigues con el tema? Escribe en el mismo chat. Tema nuevo, chat nuevo.",
+  chatN: "«Escribí “añade el jefe final” en un chat nuevo y me preguntó: ¿de qué juego? Mi nieto tampoco lo habría adivinado».", chatA: "Chat: juego", chatZ: "Chat: receta" }
+};
+/* per lesson: "same" chat (with where to find it) or a "new" chat */
+const BK = {
+ru: [["same", "чат с игрой"], ["same", "чат с сайтом"], ["new"], ["same", "чат с первым разговором"], ["new"], ["new"], ["new"]],
+en: [["same", "the chat with your game"], ["same", "the chat with your website"], ["new"], ["same", "the chat with your first conversation"], ["new"], ["new"], ["new"]],
+es: [["same", "el chat con tu juego"], ["same", "el chat con tu web"], ["new"], ["same", "el chat de tu primera conversación"], ["new"], ["new"], ["new"]]
+};
+for (const l of Object.keys(C)) { Object.assign(C[l].ui, EXTRA3[l]); C[l].L.forEach((les, i) => { les.task.bk = BK[l][i][0]; les.task.bw = BK[l][i][1] || ""; }); C[l].L[0].chatInfo = true; }
+
 {
 const LANGS = [["ru", "Русский"], ["en", "English"], ["es", "Español"]];
 const KEY = "simplyai.v2";
@@ -655,10 +685,17 @@ function copyText(txt) {
 const chip = (label, on, attrs) => `<button class="chip" aria-pressed="${on}" ${attrs}>${esc(label)}</button>`;
 const openBtn = () => `<a class="btn alt sm" href="https://claude.ai/new" target="_blank" rel="noopener">${esc(U().open)}</a>`;
 const promptBox = (txt, act) => `<div class="prompt"><span class="lbl">${esc(U().yourMsg)}</span><p id="pr">${esc(txt)}</p><div class="chips"><button class="btn cob sm" data-act="${act}">${esc(U().copy)}</button>${openBtn()}</div></div>`;
-function win(k) {
+function win(k, i) {
   const u = U();
-  return `<div class="win"><b>★ ${esc(u.starGot)}</b> ${esc(k.bonus)}${k.bp ? `<div class="bonus"><span class="lbl">${esc(u.bonusMsg)}</span><p>${esc(k.bp)}</p><div class="chips"><button class="btn sm" data-act="copyBonus">${esc(u.copy)}</button>${openBtn()}</div></div>` : ""}</div>`;
+  let b = "";
+  if (k.bp && k.bk === "same") {
+    b = `<div class="bonus"><span class="kind same">${esc(u.sameT)}</span><p>${esc(k.bp)}</p><ol class="how sm">${u.sameSteps.map(x => `<li>${esc(x.replace("{w}", k.bw))}</li>`).join("")}</ol><div class="chips"><button class="btn sm" data-act="copyBonus">${esc(u.copy)}</button></div><div class="lost"><span>${esc(u.lost)}</span><div class="chips"><button class="btn alt sm" data-act="copyAll">${esc(u.copyAll)}</button>${openBtn()}</div></div></div>`;
+  } else if (k.bp) {
+    b = `<div class="bonus"><span class="kind">${esc(u.newT)}</span><p>${esc(k.bp)}</p><div class="chips"><button class="btn sm" data-act="copyBonus">${esc(u.copy)}</button>${openBtn()}</div></div>`;
+  }
+  return `<div class="win"><b>★ ${esc(u.starGot)}</b> ${esc(k.bonus)}${b}</div>`;
 }
+const chatSvg2 = () => `<svg viewBox="0 0 346 150" aria-hidden="true"><rect width="346" height="150" fill="#2340E8"/><circle cx="320" cy="20" r="50" fill="#3552FF"/>${[0, 1].map(c => { const x = c ? 196 : 16; return `<rect x="${x}" y="16" width="134" height="118" rx="14" fill="#fff"/><text x="${x + 12}" y="38" fill="#17142B" font-family="Golos Text, sans-serif" font-size="12" font-weight="600">${esc(c ? U().chatZ : U().chatA)}</text><rect x="${x + 50}" y="50" width="72" height="16" rx="8" fill="#2340E8"/><rect x="${x + 12}" y="74" width="86" height="22" rx="8" fill="#F1F2FA"/><rect x="${x + 64}" y="104" width="58" height="16" rx="8" fill="#2340E8"/>`; }).join("")}<path d="M173 22v106" stroke="#FFC83D" stroke-width="4" stroke-dasharray="8 7" stroke-linecap="round"/><circle cx="173" cy="75" r="16" fill="#FF6A4D"/><path d="M166 68l14 14M180 68l-14 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>`;
 function nextIdx() { for (let i = 0; i < NL(); i++) if (!S.stars[i]) return i; return -1; }
 /* the lesson "Continue" opens: the one you left unfinished, else the first unfinished */
 function resumeIdx() { if (S.lastLes !== null && S.lastLes !== undefined && S.lastLes < NL() && !S.stars[S.lastLes]) return S.lastLes; return nextIdx(); }
@@ -709,7 +746,7 @@ function taskHTML(i) {
     h += `<div class="chat"><div class="me">${esc(s.cur < 0 ? k.ask : k.ps[s.cur][0])}</div><div class="ai">${esc(s.cur < 0 ? k.base : k.ps[s.cur][1])}</div></div>`;
     h += `<div class="lbl">${esc(u.phrasesLbl)}</div><div class="chips">${k.ps.map((p, pi) => chip(p[0], s.cur === pi, `data-act="ph" data-o="${pi}"`)).join("")}</div>`;
   }
-  if (done) h += win(k) + `<button class="link" data-act="redo">↺ ${esc(u.redo)}</button>`;
+  if (done) h += win(k, i) + `<button class="link" data-act="redo">↺ ${esc(u.redo)}</button>`;
   return h + "</section>";
 }
 function live() {
@@ -768,6 +805,7 @@ function pageLesson() {
   if (l.illus === "tiles") ill = `<div class="tiles"><b style="font-family:var(--hf)">${esc(l.tilesT)}</b><div class="g">${l.tiles.map((t, ti) => `<div>${ico(TICONS[ti])}${esc(t)}</div>`).join("")}</div></div>`;
   return `<div class="pg"><div class="les-top">${i > 0 ? `<button class="round" data-act="prev" aria-label="${esc(u.prevLes)}" title="${esc(u.prevLes)}">‹</button>` : ""}<span style="flex:none">${esc(u.lesson(i + 1, total))}</span><div class="bar" style="flex:1"><i style="width:${(i + 1) / total * 100}%"></i></div><button class="pillbtn" data-act="go" data-p="home">${esc(u.list)}</button></div>
   ${ill}${l.kick ? `<span class="badge" style="font-size:14px;padding:4px 12px">${esc(l.kick)}</span>` : ""}<h1>${S.stars[i] ? `<span class="got" aria-label="★">★</span> ` : ""}${esc(l.title)}</h1><p>${esc(l.body)}</p>
+  ${l.chatInfo ? `<section class="box"><h2>${esc(u.chatT)}</h2><div class="illu">${chatSvg2()}</div><p>${esc(u.chatB)}</p><div class="nina">${NINA}<div><b>${esc(u.nina)}:</b> ${esc(u.chatN)}</div></div></section>` : ""}
   <div id="task">${taskHTML(i)}</div>
   ${l.tip ? `<div class="tip"><span class="dot">i</span><span>${esc(l.tip)}</span></div>` : ""}
   <div class="nina">${NINA}<div><b>${esc(u.nina)}:</b> ${esc(l.nina)}</div></div>
@@ -859,6 +897,7 @@ function act(a, d, e) {
     case "redo": delete T[i]; saveT(); rerenderTask(); toast(U().redoDone); break;
     case "copy": copyText(promptOf(i)); break;
     case "copyBonus": copyText(cc().L[i].task.bp); break;
+    case "copyAll": copyText(promptOf(i) + "\n\n" + cc().L[i].task.bp); break;
     case "copyJob": copyText(cc().jobs[jobIdx()][1]); break;
     case "tab": S.tab = d.t; save(); render(); break;
     case "mod": S.open = S.open === +d.o ? -1 : +d.o; save(); render(); break;
