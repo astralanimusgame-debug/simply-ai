@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2340E8">
+<title>Simply AI — учимся с Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Golos+Text:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm and funny, for people who have never touched AI
+   IDEA: a phone lesson book — each page is a tiny real task you do in Claude
+   PICTURE: Grandma mascot, the game scene, live site preview and meters are the pictures
+   COLOUR and TYPE: cobalt, sun yellow, coral on white; Unbounded titles, Golos Text body
+   LAYOUT: one 480px phone column, sticky top bar, bottom navigation, sheets from below */
+:root{color-scheme:light dark;--bg:light-dark(#FFFFFF,#121019);--ink:light-dark(#17142B,#F3F1F8);--mute:light-dark(#5B5670,#B3ADC6);--soft:light-dark(#F1F2FA,#1E1B2B);--line:light-dark(#E6E8F5,#2E2A40);--cream:light-dark(#FFF1D6,#33291A);--card:light-dark(#FFFFFF,#181524);--ok:light-dark(#1F3AC7,#9AABFF);--bad:light-dark(#B4321A,#FF9B85);--cob:#2340E8;--sun:#FFC83D;--coral:#FF6A4D;--hf:'Unbounded',system-ui,sans-serif;--bf:'Golos Text',system-ui,sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--bf);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+.app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:96px}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--hf);font-weight:800;font-size:17px;margin-inline-end:auto}.brand b{color:var(--coral)}
+.starc{font-weight:600;background:var(--sun);color:#17142B;border-radius:999px;padding:4px 12px;font-size:14px;white-space:nowrap}
+.pg{padding:18px;display:flex;flex-direction:column;gap:14px}
+h1{font-family:var(--hf);font-weight:800;font-size:26px;line-height:1.1;margin:0;text-wrap:balance}
+h2{font-family:var(--hf);font-weight:600;font-size:19px;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+.btn{min-height:52px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font:600 16px var(--bf);padding:0 22px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;text-align:center}
+.btn.sun{background:var(--sun);color:#17142B}.btn.cob{background:var(--cob);color:#fff}.btn.alt{background:transparent;color:inherit;border:2px solid currentColor}
+.btn.sm{min-height:44px;font-size:15px;padding:0 18px}.btn.wide{width:100%}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;border:2px solid var(--line);border-radius:999px;padding:0 14px;background:var(--card);color:var(--ink);font:600 15px var(--bf);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--cob);border-color:var(--cob);color:#fff}
+.lbl{font-size:14px;font-weight:600;color:var(--mute)}
+.task{border:3px solid var(--ink);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.badge{align-self:flex-start;background:var(--sun);color:#17142B;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cnt{font-size:14px;font-weight:600;color:var(--ok);white-space:nowrap}
+.prompt{background:var(--soft);border:2px solid var(--cob);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.prompt .lbl{color:var(--ok)}.prompt p{font-size:15px;line-height:1.45;overflow-wrap:anywhere;white-space:pre-line}
+.win{background:var(--sun);color:#17142B;border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.4}
+.nina{display:flex;gap:12px;align-items:flex-start;background:var(--cream);border-radius:18px;padding:14px;font-size:15px;line-height:1.4}
+.nina svg{flex:none}
+.tip{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:18px;padding:14px;font-size:15px;line-height:1.4}
+.dot{flex:none;width:28px;height:28px;border-radius:50%;background:var(--cob);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--cob);border-radius:999px;transition:width .4s}
+.q{background:var(--soft);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.q b{font-size:16px;line-height:1.4}.two{display:flex;gap:8px}.two .chip{flex:1}
+.fb{font-size:14px;line-height:1.4}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+label{display:block;font-size:14px;font-weight:600;color:var(--mute);margin-bottom:4px}
+input{width:100%;min-height:48px;border:2px solid var(--line);border-radius:14px;padding:8px 12px;font:16px var(--bf);color:var(--ink);background:var(--card)}
+.illu{border-radius:24px;overflow:hidden;line-height:0}.illu svg{width:100%;height:auto;display:block}
+.les-top{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--mute)}
+.round{flex:none;width:44px;height:44px;border-radius:50%;background:var(--soft);border:0;color:var(--ink);font-size:22px;cursor:pointer;display:grid;place-items:center}
+.hero{background:var(--cob);color:#fff;border-radius:26px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.hero p{color:#E3E8FF}
+.cover{position:relative;border-radius:20px;background:#3552FF;overflow:hidden;line-height:0}
+.cover svg{width:100%;height:auto;display:block}
+.bubs{position:absolute;right:12px;top:14px;width:52%;display:flex;flex-direction:column;gap:8px;line-height:1.3}
+.bub{background:#fff;color:#17142B;border-radius:16px 16px 4px 16px;padding:9px 11px;font-size:14px}
+.bub.y{background:var(--sun);border-radius:16px 16px 16px 4px}
+.li{display:flex;gap:12px;align-items:center;width:100%;text-align:start;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px;min-height:64px;cursor:pointer;color:var(--ink);font:inherit}
+.num{flex:none;width:40px;height:40px;border-radius:12px;background:var(--soft);color:var(--ok);display:grid;place-items:center;font-family:var(--hf);font-weight:800}
+.li.done .num{background:var(--sun);color:#17142B}
+.li .tx{flex:1}.li .tx b{display:block;font-size:16px;line-height:1.3}.li .tx small{color:var(--mute);font-size:13px}
+.coral{background:var(--coral);color:#17142B;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
+.tabs button{flex:1;min-height:48px;border:0;background:var(--bg);color:var(--ink);font:600 16px var(--bf);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stats div{background:#3552FF;border-radius:14px;padding:10px}.stats b{display:block;font-family:var(--hf);font-size:18px;white-space:nowrap}.stats span{font-size:13px}
+.mod{border:2px solid var(--line);border-radius:20px;overflow:hidden}.mod.on{border-color:var(--cob)}
+.mod>button{width:100%;display:flex;gap:12px;align-items:center;text-align:start;background:var(--card);border:0;padding:14px;min-height:64px;cursor:pointer;font:inherit;color:var(--ink)}
+.mod ul{margin:0;padding:12px 14px 14px 34px;background:var(--soft);display:flex;flex-direction:column;gap:6px;font-size:15px}
+.mod .st{font-size:13px;color:var(--mute);padding:0 14px 12px;background:var(--soft)}
+.price{font-family:var(--hf);font-weight:800;font-size:20px;white-space:nowrap}
+.cert{border:3px double var(--ink);border-radius:20px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:6px;background:var(--card)}
+.cert .nm{font-family:var(--hf);font-weight:800;font-size:24px;line-height:1.15;overflow-wrap:anywhere}
+.cert.lock{opacity:.6}
+.prof{display:flex;gap:14px;align-items:center}
+.ava{flex:none;width:56px;height:56px;border-radius:50%;background:var(--sun);color:#17142B;display:grid;place-items:center;font-family:var(--hf);font-weight:800;font-size:22px}
+.box{border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.sp{display:flex;justify-content:space-between;gap:10px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+.nav div{display:flex;max-width:480px;margin:0 auto}
+.nav button{flex:1;min-height:64px;background:none;border:0;color:var(--mute);font:600 13px var(--bf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.nav button[aria-current=page]{color:var(--ok)}
+.sheet-bg{position:fixed;inset:0;background:rgba(10,6,20,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--bg);color:var(--ink);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;z-index:30;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.langs{display:flex;flex-direction:column;gap:10px}
+.site{background:var(--coral);border-radius:22px;padding:16px 18px 0}
+.site .w{background:#fff;color:#17142B;border-radius:16px 16px 0 0;overflow:hidden}
+.site .bz{display:flex;gap:6px;align-items:center;padding:8px 12px;background:#17142B;color:#C9C6D6;font-size:11px}
+.site .bz i{width:9px;height:9px;border-radius:50%;background:var(--coral)}.site .bz i+i{background:var(--sun)}.site .bz i+i+i{background:#fff;margin-inline-end:6px}
+.site .hd{padding:16px;color:#fff}.site .hd b{display:block;font-family:var(--hf);font-size:18px;line-height:1.15;overflow-wrap:anywhere}.site .hd span{font-size:13px;opacity:.9}
+.site .bd{padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-block;border:2px solid #17142B;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
+.call{align-self:flex-start;background:#17142B;color:#fff;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;overflow-wrap:anywhere}
+.chat{background:var(--sun);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px;color:#17142B}
+.me{align-self:flex-end;max-width:85%;background:var(--cob);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 12px;font-size:15px;line-height:1.35}
+.ai{max-width:94%;background:#fff;border-radius:16px 16px 16px 4px;padding:12px;font-size:15px;line-height:1.45;white-space:pre-line}
+.meter{background:var(--coral);color:#17142B;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.meter .bar{background:#fff}.meter .bar i{background:#17142B}
+.tiles{background:var(--cob);color:#fff;border-radius:24px;padding:16px}
+.tiles .g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.tiles .g div{background:#3552FF;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;line-height:1.25}
+.chk{display:flex;gap:12px;align-items:flex-start;text-align:start;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:12px;min-height:56px;font:15px/1.4 var(--bf);cursor:pointer;width:100%}
+.chk[aria-pressed=true]{border-color:var(--cob);background:var(--soft)}
+.chk .bx{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--cob);display:grid;place-items:center;font-weight:800;color:#fff}
+.chk[aria-pressed=true] .bx{background:var(--cob)}
+.steps{display:flex;flex-direction:column;gap:6px;font-size:15px}
+.link{background:none;border:0;color:var(--ok);font:600 15px var(--bf);cursor:pointer;min-height:44px;align-self:flex-start;padding:0}
+.pillbtn{flex:none;min-height:40px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:0 12px;font:600 14px var(--bf);cursor:pointer}
+.bonus{margin-top:10px;background:#fff;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.bonus .lbl{color:#5B5670}.bonus p{font-size:15px;color:#17142B;overflow-wrap:anywhere}
+.bonus .btn:not(.alt){background:#17142B;color:#fff}.bonus .btn.alt{color:#17142B}
+.why{display:flex;gap:10px;align-items:center;font-size:16px}
+.how{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px;font-size:16px}
+.steps-top{display:flex;gap:6px}.dotstep{width:28px;height:6px;border-radius:3px;background:var(--line)}.dotstep.on{background:var(--cob)}
+.got{color:#E0A800}
+.g{flex:none;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--cob);display:grid;place-items:center;font-weight:800;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:default}
+.two .btn.alt{flex:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app"><div id="view"></div></div>
+<nav class="nav" id="nav" hidden></nav>
+<div id="sheet"></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const C = {
+ru: {
+  ui: {
+    chooseLang: "Выберите язык", langSub: "Можно поменять потом в профиле",
+    navHome: "Главная", navCourse: "Курс", navProfile: "Профиль",
+    homeT: "Научитесь пользоваться ИИ за 25 минут",
+    homeS: "Без умных слов. Учимся на маленьких полезных заданиях — как переписка с внуком.",
+    bub1: "Здравствуйте, как вас включить?", bub2: "Уже включён! Просто напишите, что нужно.",
+    start: "Начать — сразу с игры", cont: "Продолжить: урок ", again: "Пройти интро заново",
+    introLbl: "Интро · бесплатно", done: (a, b) => `Пройдено: ${a} из ${b}`,
+    teaseT: "А что ИИ сделает в вашей работе?", teaseB: "Выберите профессию — покажем готовое задание.", teaseBtn: "Выбрать профессию",
+    lesson: (a, b) => `Урок ${a} из ${b}`, min: "мин", mini: "Мини-задание",
+    yourMsg: "Ваше сообщение для Claude — собирается само", copy: "Скопировать", copied: "Скопировано", open: "Открыть Claude",
+    copyFail: "Не получилось скопировать — выделите текст пальцем",
+    starGot: "Звезда получена!", next: "Дальше", toCourse: "К карте курса", back: "Назад",
+    right: (a, b) => `Верно: ${a} из ${b}`, tried: (a, b) => `Попробовано: ${a} из ${b}`,
+    accuracy: "Точность просьбы", phrasesLbl: "Волшебные фразы", score: "Счёт", contact: "Связаться",
+    preview: "превью вашего сайта", styleLbl: "Какой стиль?",
+    courseKick: "Сначала бесплатное интро, потом самое полезное", courseT: "ИИ пригодится в любом деле",
+    st: [["25 мин", "интро, бесплатно"], ["≈2 ч", "весь курс"], ["15 мин", "один модуль"]],
+    tabLife: "Для жизни", tabWork: "Для работы", lifeDesc: "5 модулей по 15 минут + сертификат",
+    buy: "Купить", owned: "Открыто ✓", soon: "Скоро — придёт в обновлении", locked: "Откроется после покупки",
+    workDesc: "Пакет под вашу профессию: 15 минут и 3 задания из настоящей работы.", whatJob: "Чем вы занимаетесь?",
+    tryNow: "Попробуйте прямо сейчас", inPack: "В пакете ещё: ", jobPack: "пакет профессии",
+    jobOwned: "Пакет открыт ✓ Задания придут в обновлении",
+    updT: "Новые модули — каждый месяц", updB: "Новые профессии и темы по $0.99–1.99. Купившим «Для жизни» — следующий новый модуль в подарок.",
+    certT: "Сертификат", certName: "Я дружу с ИИ", certFor: "Выдан", certLocked: "Откроется вместе с курсом «Для жизни»",
+    lifeName: "Курс «Для жизни» + сертификат",
+    loginT: "Вход через Google", loginB: "Демо-версия: настоящий вход через Google подключим в рабочей версии. Пока просто представьтесь — так сохранятся звёзды и покупки.",
+    yourName: "Как вас зовут?", loginGo: "Продолжить (демо)", cancel: "Отмена",
+    payT: "Покупка", payB: "Демо-версия: оплата через Google Play подключится в рабочей версии. Сейчас покупка откроется бесплатно — для проверки.",
+    payGo: "Купить (демо)", unlocked: "Открыто!",
+    guest: "Гость", guestSub: "Войдите, чтобы сохранить звёзды и покупки", signedSub: "Вход через Google (демо)",
+    login: "Войти через Google", logout: "Выйти",
+    langT: "Язык", statsT: "Ваши успехи", starsLbl: "Звёзд за интро", buysLbl: "Покупок", reset: "Сбросить прогресс", resetDone: "Прогресс сброшен",
+    about: "Simply AI — неофициальное учебное приложение, демо-версия. Claude — продукт компании Anthropic. Задания выполняются в самом Claude: на сайте claude.ai или в его приложении.",
+    nina: "Бабушка Нина", welcome: "Добро пожаловать, "
+  },
+  L: [
+    { kick: "Вау-момент №1", title: "Игра — одним сообщением", illus: "game",
+      body: "Claude умеет делать игры прямо в чате — достаточно описать игру словами. Соберите свою и сыграйте.",
+      nina: "«Я выбрала себя и счета за свет. Набрала 34. Внук пока 12 — тренируется».",
+      task: { type: "builder", min: 2, title: "Соберите свою игру", def: [0, 0, 0],
+        groups: [
+          { t: "Кто ловит?", o: [["Кот", "рыжий кот"], ["Собака", "весёлая собака"], ["Бабушка Нина", "бабушка Нина"]] },
+          { t: "Что падает вкусное?", o: [["Пирожки", "пирожки"], ["Яблоки", "яблоки"], ["Мандарины", "мандарины"]] },
+          { t: "От чего уворачиваться?", o: [["Тапки", "тапок"], ["Кактусы", "кактусов"], ["Счета за свет", "счетов за свет"]] }],
+        tpl: v => `Сделай простую игру прямо здесь, в чате: ${v[0]} ловит падающие ${v[1]}, а от падающих ${v[2]} надо уворачиваться. Управление — пальцем по экрану или стрелками. Счёт в углу, 3 жизни, с каждой минутой всё быстрее. Яркие весёлые цвета.`,
+        steps: ["Скопируйте сообщение", "Откройте Claude, вставьте и отправьте", "Наберите в игре 20 очков"],
+        fin: "Я набрал(а) 20 очков!", bonus: "Бонус: напишите Claude «Добавь музыку и уровень с боссом»." } },
+    { kick: "Вау-момент №2", title: "Сайт-визитка — за одно сообщение", illus: "",
+      body: "Себе, соседу-сантехнику или маме-кондитеру. Впишите данные — превью и сообщение для Claude меняются на глазах.",
+      nina: "«Сделала соседу Алексу сайт. Теперь он чинит мне кран без очереди и бесплатно».",
+      task: { type: "site", min: 3, title: "Сделайте настоящий сайт для кого-то",
+        fields: [["name", "Имя", "Алекс Миллер"], ["job", "Чем занимается", "Сантехник, 20 лет опыта"], ["city", "Город", "Берлин"],
+          ["serv", "Три услуги через запятую", "ремонт кранов, установка бойлеров, спасение от потопа"], ["contact", "Телефон или Instagram", "+1 555 012 3456"]],
+        styles: [["Надёжный", "надёжный, но с улыбкой", "#2340E8"], ["Весёлый", "весёлый и яркий", "#FF6A4D"], ["Модный", "модный, как у кофейни", "#17142B"], ["Строгий", "строгий и деловой", "#3B4256"]],
+        tpl: (d, st) => `Сделай сайт-визитку на одну страницу: ${d.name || "моё имя"}, ${d.job || "чем я занимаюсь"}, ${d.city || "мой город"}. Услуги: ${d.serv || "мои услуги"}. Контакты: ${d.contact || "мой телефон"}. Стиль — ${st}. Чтобы на телефоне тоже было красиво.`,
+        fin: "Мой сайт готов!", bonus: "Бонус: напишите «Добавь раздел с отзывами и кнопку WhatsApp»." } },
+    { kick: "", title: "Кто такой Claude — простыми словами", illus: "chat",
+      body: "Claude — помощник от компании Anthropic, с которым переписываются, как в мессенджере. Он не человек и не поисковик: не даёт десять ссылок, а сразу отвечает и делает работу. И не обижается, если переспросить сто раз.",
+      nina: "«Так он живой? — Нет. Но вежливее, чем некоторые соседи».",
+      task: { type: "quiz", min: 1, title: "Кто это сделает: поисковик или Claude?", a: "Поисковик", b: "Claude",
+        qs: [["Покажет десять ссылок на сайты про борщ", "a", "Верно: поисковик ищет страницы. А Claude сразу напишет рецепт под ваши продукты.", "Почти: Claude сразу даст рецепт, а десять ссылок — работа поисковика."],
+          ["Напишет тост на свадьбу Люды", "b", "Верно! Поисковик найдёт чужие тосты, а Claude напишет именно для Люды.", "Поисковик найдёт только чужие тосты. Написать для Люды — работа Claude."],
+          ["Объяснит счёт за свет простыми словами", "b", "Верно! Можно даже сфотографировать счёт и спросить, что к чему.", "Это Claude: ему можно показать фото счёта и попросить объяснить."],
+          ["Переведёт меню в Италии и подскажет, что не острое", "b", "Верно! Claude и переведёт, и объяснит, что это за блюдо.", "Это Claude: он и переведёт, и расскажет, что за блюдо."]],
+        bonus: "Спросите самого Claude: «Чем ты отличаешься от поисковика? Объясни, как бабушке»." } },
+    { kick: "", title: "Где найти Claude", illus: "devices",
+      body: "На компьютере — сайт claude.ai. На телефоне — приложение Claude в Google Play или App Store. Войти можно через Google. Для начала хватает бесплатного тарифа.",
+      nina: "«Пароль от Google у меня на холодильнике». — Нина, давайте лучше в записную книжку. И не на кухне.",
+      task: { type: "check", min: 3, title: "Ваш первый разговор",
+        steps: ["Открыл(а) claude.ai или приложение Claude", "Вошёл(вошла) через Google", "Отправил(а) первое сообщение — оно ниже", "Получил(а) ответ с пятью идеями"],
+        nameLbl: "Как вас зовут? Впишем в первое сообщение", defName: "Нина",
+        tpl: n => `Привет! Меня зовут ${n}. Я только начинаю пользоваться искусственным интеллектом. Расскажи простыми словами, чем ты можешь помочь мне в обычной жизни — дай 5 примеров.`,
+        bonus: "Вы официально знакомы с Claude. Выберите одну из его 5 идей и напишите: «Давай сделаем первую»." } },
+    { kick: "", title: "Формула хорошей просьбы", illus: "",
+      body: "Claude не читает мысли. Попросите просто «Напиши поздравление» — получите открытку из киоска. Добавьте пять деталей — получите то, что нужно.",
+      nina: "«Попросила поздравление — получила „С днём рождения!“. А у Люды, между прочим, свадьба. Сама виновата, не сказала».",
+      task: { type: "builder", meter: true, min: 2, title: "Соберите просьбу на 5 из 5", def: [null, null, null, null, null],
+        groups: [
+          { t: "1. Что сделать?", o: [["Поздравление", "поздравление"], ["Письмо", "письмо"], ["Сказку", "сказку"]] },
+          { t: "2. Для кого?", o: [["Коллеге Анне", "коллеге Анне"], ["Соседу Алексу", "соседу Алексу"], ["Внуку Давиду, 6 лет", "внуку Давиду (6 лет)"]] },
+          { t: "3. Сколько?", o: [["3 предложения", "3 предложения"], ["5 строк в рифму", "5 строк в рифму"], ["На 1 минуту", "на 1 минуту чтения"]] },
+          { t: "4. Каким тоном?", o: [["Тепло", "тёплым тоном"], ["С юмором", "с юмором"], ["Официально", "официально"]] },
+          { t: "5. Что обязательно?", o: [["Про кофе", "упомяни кофе"], ["Про кота Барсика", "упомяни кота Барсика"], ["Без сложных слов", "без сложных слов"]] }],
+        tpl: v => { const r = [v[2], v[3], v[4]].filter(Boolean); return "Напиши " + (v[0] || "что-нибудь") + (v[1] ? " " + v[1] : "") + (r.length ? ": " + r.join(", ") : "") + "."; },
+        meterV: ["Claude будет гадать на кофейной гуще", "Claude угадывает наполовину", "Claude угадывает наполовину", "Уже неплохо — ещё чуть-чуть", "Почти идеально!", "Идеальная просьба — Claude поймёт с первого раза"],
+        bonus: "Отправьте эту просьбу Claude, а потом — просто «Напиши поздравление». Сравните ответы." } },
+    { kick: "", title: "Не понравилось? Так и скажите", illus: "",
+      body: "Первый ответ — черновик. Его правят словами, как просьбу портному: тут ушить, там удлинить. Начинать заново не нужно.",
+      tip: "Новая тема — новый чат. Тогда тост для дяди не перепутается с рецептом борща.",
+      nina: "«А можно ему сказать „короче“? — Можно. Он не обижается. Не то что дед».",
+      task: { type: "phrases", min: 1, title: "Нажимайте фразы — смотрите, как меняется тост",
+        ask: "Напиши тост на юбилей дяди Макса",
+        base: "Дорогой дядя Макс! Сегодня мы собрались, чтобы поздравить тебя с 60-летием. Ты всегда был опорой нашей семьи, мудрым советчиком и душой любого застолья. Мы помним, как ты учил нас жарить шашлык, чинить велосипед и никогда не сдаваться… (и ещё на две минуты)",
+        ps: [["Короче", "За дядю Макса — опору семьи и душу застолья! С юбилеем!"],
+          ["Смешнее", "За дядю Макса! Пусть шашлык у него всегда будет сочным, а давление — никогда не поднимается!"],
+          ["Серьёзнее", "Уважаемый Максим Петрович, примите поздравления с 60-летием. Ваша мудрость и забота — пример для всей нашей семьи."],
+          ["Проще, для ребёнка", "Дядя Макс, ты добрый и весёлый! Поздравляю с днём рождения! Пусть у тебя будет много-много торта!"],
+          ["Переведи на английский", "A toast to Uncle Max! May his barbecue always be juicy and his blood pressure never rise!"],
+          ["Дай 3 варианта", "1. За дядю Макса — нашу опору!\n2. За того, кто жарит лучший шашлык в городе!\n3. За 60 лет мудрости и ни одного скучного дня!"]],
+        bonus: "Теперь по-настоящему: попросите Claude тост для своего родственника и поправьте его двумя фразами." } },
+    { kick: "", title: "Что умеет — и где осторожно", illus: "tiles",
+      tilesT: "Можно просить", tiles: ["Письма и жалобы", "Сказки и тосты", "Бюджет и таблицы", "Перевод", "Фото документа", "План поездки"],
+      body: "Claude уверен, как зять у мангала, но иногда путает факты. Три правила: важное проверять, пароли не писать, врача и юриста не заменять.",
+      nina: "«Спросила, какие таблетки пить от давления. Он всё объяснил и отправил к врачу. Совсем как внук».",
+      task: { type: "quiz", min: 2, title: "Можно или осторожно?", a: "Можно", b: "Осторожно",
+        qs: [["Сфотографировать квитанцию за свет и попросить объяснить", "a", "Можно! Только личные номера на фото лучше прикрыть пальцем.", "Это как раз можно: Claude хорошо объясняет квитанции. Личные номера просто прикройте."],
+          ["Написать пароль от почты, чтобы он её «проверил»", "b", "Верно, нельзя! Пароль не нужен никому, кроме вас.", "Осторожно! Пароли не пишите никогда и никому — даже очень вежливому помощнику."],
+          ["Спросить про лекарство и выпить, не спросив врача", "b", "Верно. Объяснит он хорошо, но дозу решает только врач.", "Осторожно! Claude объяснит, но решение о лекарстве — только с врачом."],
+          ["Попросить сказку для внука с его именем", "a", "Можно! Это одно из его любимых занятий.", "Это совершенно безопасно — смело просите!"],
+          ["Отправить номер карты, чтобы посчитал бюджет", "b", "Верно. Для бюджета хватит сумм — номер карты не нужен.", "Осторожно! Для бюджета нужны только суммы, а номер карты — никогда."],
+          ["Проверить по календарю дату, которую он назвал", "a", "Можно и нужно! Важные даты лучше перепроверять.", "Это как раз правильно: важные даты и цифры стоит перепроверять."]],
+        bonus: "Интро пройдено! Можно смело пользоваться — и не бояться." } }
+  ],
+  life: [["Фото и документы", ["Сфотографировать счёт и понять каждую строчку", "Разобрать договор: что мелким шрифтом?", "Перевести меню или табличку за границей"]],
+    ["Деньги и таблицы", ["Семейный бюджет на месяц", "Список покупок по меню на неделю", "Сравнить два тарифа или кредита простыми словами"]],
+    ["Голосом, без клавиатуры", ["Спросить рецепт, пока руки в муке", "Надиктовать письмо вместо набора"]],
+    ["Здоровье и дом — без паники", ["Подготовить вопросы к врачу", "Расписание приёма лекарств таблицей", "План уборки или ремонта по шагам"]],
+    ["Семья и творчество", ["Сказка, где герой — ваш внук", "Викторина для семейного праздника", "Открытка со стихом на день рождения"]]],
+  jobs: [["Магазин и продажи", "Напиши 5 коротких постов для соцсетей про скидку на зимние куртки — весело, с призывом зайти в магазин.", "описания товаров, ответы на отзывы"],
+    ["Учитель", "Сделай викторину из 10 вопросов про Солнечную систему для 4 класса, с ответами в конце.", "план урока, письмо родителям"],
+    ["Мастер и услуги", "Клиент требует скидку 30% за мелкую царапину. Напиши вежливый, но твёрдый ответ.", "прайс-лист, объявление об услугах"],
+    ["Офис", "Сократи этот отчёт до 5 главных пунктов для начальника: [вставьте текст отчёта].", "деловые письма, протокол встречи"],
+    ["Водитель и курьер", "Помоги посчитать расходы на бензин за месяц: 120 км в день, 6 дней в неделю, расход 8 литров на 100 км.", "жалоба на штраф, план отпуска"],
+    ["Кафе и кухня", "Придумай меню дня из того, что осталось: курица, рис, морковь, сливки, лимон. Три блюда и цены.", "описание меню, расчёт порций"],
+    ["Сад и ферма", "Что можно посадить на теневом балконе и как за этим ухаживать? Ответь списком.", "календарь посадок, объявление о продаже урожая"],
+    ["Блог и соцсети", "Придумай 10 идей для коротких видео про мою маленькую пекарню.", "подписи к постам, план публикаций"]]
+},
+
+en: {
+  ui: {
+    chooseLang: "Choose your language", langSub: "You can change it later in your profile",
+    navHome: "Home", navCourse: "Course", navProfile: "Profile",
+    homeT: "Learn to use AI in 25 minutes",
+    homeS: "No jargon. You learn through small, useful tasks — like texting with your grandkids.",
+    bub1: "Hello, how do I turn you on?", bub2: "I’m already on! Just write what you need.",
+    start: "Start — with a game", cont: "Continue: lesson ", again: "Take the intro again",
+    introLbl: "Intro · free", done: (a, b) => `Completed: ${a} of ${b}`,
+    teaseT: "What could AI do in your job?", teaseB: "Pick your profession — we’ll show you a ready-made task.", teaseBtn: "Pick a profession",
+    lesson: (a, b) => `Lesson ${a} of ${b}`, min: "min", mini: "Mini task",
+    yourMsg: "Your message for Claude — it writes itself", copy: "Copy", copied: "Copied", open: "Open Claude",
+    copyFail: "Couldn’t copy — select the text with your finger",
+    starGot: "Star earned!", next: "Next", toCourse: "To the course map", back: "Back",
+    right: (a, b) => `Correct: ${a} of ${b}`, tried: (a, b) => `Tried: ${a} of ${b}`,
+    accuracy: "Request accuracy", phrasesLbl: "Magic phrases", score: "Score", contact: "Contact",
+    preview: "your site preview", styleLbl: "Which style?",
+    courseKick: "Free intro first, then the most useful part", courseT: "AI helps in everything you do",
+    st: [["25 min", "intro, free"], ["≈2 h", "whole course"], ["15 min", "one module"]],
+    tabLife: "For life", tabWork: "For work", lifeDesc: "5 modules, 15 minutes each + certificate",
+    buy: "Buy", owned: "Unlocked ✓", soon: "Coming soon in an update", locked: "Unlocks after purchase",
+    workDesc: "A pack for your profession: 15 minutes and 3 tasks from real work.", whatJob: "What do you do?",
+    tryNow: "Try it right now", inPack: "Also in the pack: ", jobPack: "profession pack",
+    jobOwned: "Pack unlocked ✓ Tasks arrive in an update",
+    updT: "New modules every month", updB: "New professions and topics for $0.99–1.99. Buy “For life” and get the next new module as a gift.",
+    certT: "Certificate", certName: "AI Friend", certFor: "Awarded to", certLocked: "Unlocks together with the “For life” course",
+    lifeName: "“For life” course + certificate",
+    loginT: "Sign in with Google", loginB: "Demo version: real Google sign-in comes in the full version. For now just tell us your name — your stars and purchases will be saved.",
+    yourName: "What’s your name?", loginGo: "Continue (demo)", cancel: "Cancel",
+    payT: "Purchase", payB: "Demo version: payment through Google Play comes in the full version. For now the purchase unlocks for free, for testing.",
+    payGo: "Buy (demo)", unlocked: "Unlocked!",
+    guest: "Guest", guestSub: "Sign in to save your stars and purchases", signedSub: "Signed in with Google (demo)",
+    login: "Sign in with Google", logout: "Sign out",
+    langT: "Language", statsT: "Your progress", starsLbl: "Intro stars", buysLbl: "Purchases", reset: "Reset progress", resetDone: "Progress reset",
+    about: "Simply AI is an unofficial learning app, demo version. Claude is a product of Anthropic. You do the tasks in Claude itself: on claude.ai or in its app.",
+    nina: "Grandma Rose", welcome: "Welcome, "
+  },
+  L: [
+    { kick: "Wow moment #1", title: "A game in one message", illus: "game",
+      body: "Claude can make games right in the chat — you just describe the game in words. Build your own and play.",
+      nina: "“I picked myself and electricity bills. Scored 34. My grandson has 12 so far — he’s practicing.”",
+      task: { type: "builder", min: 2, title: "Build your own game", def: [0, 0, 0],
+        groups: [
+          { t: "Who catches?", o: [["Cat", "a ginger cat"], ["Dog", "a happy dog"], ["Grandma Rose", "Grandma Rose"]] },
+          { t: "What tasty thing falls?", o: [["Pies", "pies"], ["Apples", "apples"], ["Tangerines", "tangerines"]] },
+          { t: "What to dodge?", o: [["Slippers", "slippers"], ["Cacti", "cacti"], ["Electricity bills", "electricity bills"]] }],
+        tpl: v => `Make a simple game right here in the chat: ${v[0]} catches falling ${v[1]} and has to dodge falling ${v[2]}. Control it by swiping on the screen or with the arrow keys. Score in the corner, 3 lives, faster every minute. Bright, cheerful colors.`,
+        steps: ["Copy the message", "Open Claude, paste it and send", "Score 20 points in the game"],
+        fin: "I scored 20 points!", bonus: "Bonus: tell Claude “Add music and a boss level”." } },
+    { kick: "Wow moment #2", title: "A business card website in one message", illus: "",
+      body: "For yourself, a plumber neighbor or a mom who bakes cakes. Type the details — the preview and the message for Claude change as you type.",
+      nina: "“I made a website for my neighbor Alex. Now he fixes my tap with no waiting — and for free.”",
+      task: { type: "site", min: 3, title: "Make a real website for someone",
+        fields: [["name", "Name", "Alex Miller"], ["job", "What they do", "Plumber, 20 years of experience"], ["city", "City", "Berlin"],
+          ["serv", "Three services, separated by commas", "tap repair, boiler installation, flood rescue"], ["contact", "Phone or Instagram", "+1 555 012 3456"]],
+        styles: [["Reliable", "reliable but friendly", "#2340E8"], ["Playful", "playful and bright", "#FF6A4D"], ["Trendy", "trendy, like a coffee shop", "#17142B"], ["Formal", "formal and businesslike", "#3B4256"]],
+        tpl: (d, st) => `Make a one-page business card website: ${d.name || "my name"}, ${d.job || "what I do"}, ${d.city || "my city"}. Services: ${d.serv || "my services"}. Contact: ${d.contact || "my phone"}. Style: ${st}. It should look good on a phone too.`,
+        fin: "My site is ready!", bonus: "Bonus: write “Add a reviews section and a WhatsApp button”." } },
+    { kick: "", title: "Who is Claude — in plain words", illus: "chat",
+      body: "Claude is an assistant made by the company Anthropic. You chat with it like in a messenger. It’s not a person and not a search engine: instead of ten links it answers right away and does the work. And it never minds if you ask a hundred times.",
+      nina: "“So is it alive?” — No. But it’s politer than some neighbors.",
+      task: { type: "quiz", min: 1, title: "Who would do it: a search engine or Claude?", a: "Search engine", b: "Claude",
+        qs: [["Shows ten links to websites about soup", "a", "Right: a search engine finds pages. Claude would just write a recipe for your ingredients.", "Almost: Claude gives the recipe right away — ten links is a search engine’s job."],
+          ["Writes a toast for Lucy’s wedding", "b", "Right! A search engine finds other people’s toasts; Claude writes one just for Lucy.", "A search engine only finds other people’s toasts. Writing one for Lucy is Claude’s job."],
+          ["Explains your electricity bill in plain words", "b", "Right! You can even take a photo of the bill and ask what’s what.", "That’s Claude: you can show it a photo of the bill and ask it to explain."],
+          ["Translates a menu in Italy and says what’s not spicy", "b", "Right! Claude translates and explains what the dish is.", "That’s Claude: it translates and tells you about the dish."]],
+        bonus: "Ask Claude yourself: “How are you different from a search engine? Explain it like you would to a grandma.”" } },
+    { kick: "", title: "Where to find Claude", illus: "devices",
+      body: "On a computer — the website claude.ai. On a phone — the Claude app on Google Play or the App Store. You can sign in with Google. The free plan is enough to start.",
+      nina: "“My Google password is on the fridge.” — Rose, let’s move it to a notebook. Not in the kitchen.",
+      task: { type: "check", min: 3, title: "Your first conversation",
+        steps: ["Opened claude.ai or the Claude app", "Signed in with Google", "Sent the first message — it’s below", "Got an answer with five ideas"],
+        nameLbl: "What’s your name? We’ll put it in your first message", defName: "Rose",
+        tpl: n => `Hi! My name is ${n}. I’m just starting to use artificial intelligence. Explain in simple words how you can help me in everyday life — give me 5 examples.`,
+        bonus: "You and Claude are officially acquainted. Pick one of its 5 ideas and write: “Let’s do the first one.”" } },
+    { kick: "", title: "The formula of a good request", illus: "",
+      body: "Claude can’t read minds. Ask just “Write a congratulation” and you get a gas-station greeting card. Add five details and you get exactly what you need.",
+      nina: "“I asked for a congratulation and got ‘Happy birthday!’. But Lucy is getting married. My fault — I didn’t say.”",
+      task: { type: "builder", meter: true, min: 2, title: "Build a 5 out of 5 request", def: [null, null, null, null, null],
+        groups: [
+          { t: "1. What to do?", o: [["Congratulation", "a congratulation message"], ["Letter", "a letter"], ["Fairy tale", "a fairy tale"]] },
+          { t: "2. For whom?", o: [["Colleague Anna", "for my colleague Anna"], ["Neighbor Alex", "for my neighbor Alex"], ["Grandson David, 6", "for my grandson David (6)"]] },
+          { t: "3. How long?", o: [["3 sentences", "3 sentences"], ["5 rhyming lines", "5 rhyming lines"], ["1 minute", "1 minute to read"]] },
+          { t: "4. What tone?", o: [["Warm", "warm tone"], ["Funny", "with humor"], ["Formal", "formal"]] },
+          { t: "5. What’s a must?", o: [["About coffee", "mention coffee"], ["About the cat Whiskers", "mention the cat Whiskers"], ["No hard words", "no difficult words"]] }],
+        tpl: v => { const r = [v[2], v[3], v[4]].filter(Boolean); return "Write " + (v[0] || "something") + (v[1] ? " " + v[1] : "") + (r.length ? ": " + r.join(", ") : "") + "."; },
+        meterV: ["Claude has to read tea leaves", "Claude is half guessing", "Claude is half guessing", "Not bad — a little more", "Almost perfect!", "Perfect request — Claude gets it the first time"],
+        bonus: "Send this request to Claude, then just “Write a congratulation”. Compare the answers." } },
+    { kick: "", title: "Don’t like it? Just say so", illus: "",
+      body: "The first answer is a draft. You adjust it with words, like telling a tailor: take it in here, let it out there. No need to start over.",
+      tip: "New topic — new chat. Then Uncle Max’s toast won’t get mixed up with a soup recipe.",
+      nina: "“Can I tell it ‘shorter’?” — Yes. It doesn’t get offended. Unlike Grandpa.",
+      task: { type: "phrases", min: 1, title: "Tap the phrases — watch the toast change",
+        ask: "Write a toast for Uncle Max’s 60th birthday",
+        base: "Dear Uncle Max! Today we have gathered to celebrate your 60th birthday. You have always been the pillar of our family, a wise adviser and the soul of every party. We remember how you taught us to grill, to fix a bike and to never give up… (and two more minutes of this)",
+        ps: [["Shorter", "To Uncle Max — the pillar of the family and the soul of the party! Happy birthday!"],
+          ["Funnier", "To Uncle Max! May his barbecue always be juicy and his blood pressure never rise!"],
+          ["More formal", "Dear Mr. Miller, please accept our warmest congratulations on your 60th birthday. Your wisdom and care are an example to our whole family."],
+          ["Simpler, for a child", "Uncle Max, you are kind and funny! Happy birthday! I hope you get lots and lots of cake!"],
+          ["Translate into Spanish", "¡Por el tío Max! Que su barbacoa siempre esté jugosa y su presión nunca suba."],
+          ["Give me 3 options", "1. To Uncle Max — our rock!\n2. To the man who grills the best barbecue in town!\n3. To 60 years of wisdom and not a single boring day!"]],
+        bonus: "Now for real: ask Claude for a toast for one of your relatives and fix it with two phrases." } },
+    { kick: "", title: "What it can do — and where to be careful", illus: "tiles",
+      tilesT: "You can ask for", tiles: ["Letters and complaints", "Stories and toasts", "Budgets and tables", "Translation", "Photo of a document", "Trip plans"],
+      body: "Claude is as confident as an uncle at a barbecue, but sometimes mixes up facts. Three rules: check what matters, never type passwords, and don’t replace your doctor or lawyer.",
+      nina: "“I asked which pills to take for blood pressure. It explained everything and sent me to the doctor. Just like my grandson.”",
+      task: { type: "quiz", min: 2, title: "OK or careful?", a: "OK", b: "Careful",
+        qs: [["Take a photo of a power bill and ask for an explanation", "a", "OK! Just cover personal numbers with your finger.", "This one is fine: Claude explains bills well. Just cover personal numbers."],
+          ["Type your email password so it can “check” your inbox", "b", "Right — never! Nobody but you needs your password.", "Careful! Never type passwords, not even to a very polite assistant."],
+          ["Ask about a medicine and take it without asking a doctor", "b", "Right. It explains well, but only a doctor decides the dose.", "Careful! Claude explains, but decisions about medicine are for your doctor."],
+          ["Ask for a bedtime story with your grandson’s name", "a", "OK! That’s one of its favorite things.", "This is completely safe — go ahead!"],
+          ["Send your card number so it can work out a budget", "b", "Right. A budget needs amounts only — never a card number.", "Careful! A budget only needs amounts, never your card number."],
+          ["Check a date it mentioned against a calendar", "a", "OK, and smart! Important dates are worth double-checking.", "That’s exactly right: double-check important dates and numbers."]],
+        bonus: "Intro complete! Use it boldly — no need to be afraid." } }
+  ],
+  life: [["Photos and documents", ["Photograph a bill and understand every line", "Decode a contract: what’s in the small print?", "Translate a menu or a sign abroad"]],
+    ["Money and tables", ["Family budget for a month", "Shopping list from a weekly menu", "Compare two phone plans or loans in plain words"]],
+    ["By voice, no keyboard", ["Ask for a recipe while your hands are in dough", "Dictate a letter instead of typing"]],
+    ["Health and home — no panic", ["Prepare questions for your doctor", "Medicine schedule as a table", "Step-by-step cleaning or repair plan"]],
+    ["Family and creativity", ["A story where your grandchild is the hero", "A quiz for a family party", "A birthday card with a poem"]]],
+  jobs: [["Shop and sales", "Write 5 short social media posts about a discount on winter jackets — fun, with an invitation to visit the shop.", "product descriptions, replies to reviews"],
+    ["Teacher", "Make a 10-question quiz about the Solar System for 4th grade, with the answers at the end.", "lesson plan, letter to parents"],
+    ["Trades and services", "A client demands a 30% discount for a tiny scratch. Write a polite but firm reply.", "price list, service ad"],
+    ["Office", "Shorten this report to the 5 main points for my boss: [paste the report text].", "business emails, meeting minutes"],
+    ["Driver and courier", "Help me work out my monthly fuel costs: 120 km a day, 6 days a week, 8 liters per 100 km.", "appeal against a fine, vacation plan"],
+    ["Café and kitchen", "Create a menu of the day from leftovers: chicken, rice, carrots, cream, lemon. Three dishes with prices.", "menu descriptions, portion calculations"],
+    ["Garden and farm", "What can I grow on a shady balcony, and how do I care for it? Answer as a list.", "planting calendar, ad for selling your harvest"],
+    ["Blog and social media", "Give me 10 ideas for short videos about my small bakery.", "post captions, posting plan"]]
+},
+
+es: {
+  ui: {
+    chooseLang: "Elige tu idioma", langSub: "Puedes cambiarlo luego en tu perfil",
+    navHome: "Inicio", navCourse: "Curso", navProfile: "Perfil",
+    homeT: "Aprende a usar la IA en 25 minutos",
+    homeS: "Sin palabras raras. Se aprende con tareas pequeñas y útiles, como chatear con tus nietos.",
+    bub1: "Hola, ¿cómo te enciendo?", bub2: "¡Ya estoy encendido! Solo escribe lo que necesitas.",
+    start: "Empezar con un juego", cont: "Continuar: lección ", again: "Repetir la intro",
+    introLbl: "Intro · gratis", done: (a, b) => `Completadas: ${a} de ${b}`,
+    teaseT: "¿Qué haría la IA en tu trabajo?", teaseB: "Elige tu profesión y te mostramos una tarea lista.", teaseBtn: "Elegir profesión",
+    lesson: (a, b) => `Lección ${a} de ${b}`, min: "min", mini: "Minitarea",
+    yourMsg: "Tu mensaje para Claude se escribe solo", copy: "Copiar", copied: "Copiado", open: "Abrir Claude",
+    copyFail: "No se pudo copiar: selecciona el texto con el dedo",
+    starGot: "¡Estrella ganada!", next: "Siguiente", toCourse: "Al mapa del curso", back: "Atrás",
+    right: (a, b) => `Aciertos: ${a} de ${b}`, tried: (a, b) => `Probadas: ${a} de ${b}`,
+    accuracy: "Precisión de la petición", phrasesLbl: "Frases mágicas", score: "Puntos", contact: "Contactar",
+    preview: "vista previa de tu web", styleLbl: "¿Qué estilo?",
+    courseKick: "Primero la intro gratis, luego lo más útil", courseT: "La IA sirve para todo",
+    st: [["25 min", "intro, gratis"], ["≈2 h", "curso completo"], ["15 min", "un módulo"]],
+    tabLife: "Para la vida", tabWork: "Para el trabajo", lifeDesc: "5 módulos de 15 minutos + certificado",
+    buy: "Comprar", owned: "Desbloqueado ✓", soon: "Muy pronto, en una actualización", locked: "Se desbloquea al comprar",
+    workDesc: "Un paquete para tu profesión: 15 minutos y 3 tareas de tu trabajo real.", whatJob: "¿A qué te dedicas?",
+    tryNow: "Pruébalo ahora mismo", inPack: "También en el paquete: ", jobPack: "paquete de profesión",
+    jobOwned: "Paquete desbloqueado ✓ Las tareas llegan en una actualización",
+    updT: "Módulos nuevos cada mes", updB: "Nuevas profesiones y temas por $0.99–1.99. Si compras «Para la vida», el próximo módulo nuevo es de regalo.",
+    certT: "Certificado", certName: "Amigo de la IA", certFor: "Otorgado a", certLocked: "Se desbloquea junto con el curso «Para la vida»",
+    lifeName: "Curso «Para la vida» + certificado",
+    loginT: "Entrar con Google", loginB: "Versión demo: el acceso real con Google llegará en la versión completa. Por ahora dinos tu nombre y guardaremos tus estrellas y compras.",
+    yourName: "¿Cómo te llamas?", loginGo: "Continuar (demo)", cancel: "Cancelar",
+    payT: "Compra", payB: "Versión demo: el pago con Google Play llegará en la versión completa. Ahora la compra se desbloquea gratis, para probar.",
+    payGo: "Comprar (demo)", unlocked: "¡Desbloqueado!",
+    guest: "Invitado", guestSub: "Entra para guardar tus estrellas y compras", signedSub: "Entraste con Google (demo)",
+    login: "Entrar con Google", logout: "Salir",
+    langT: "Idioma", statsT: "Tu progreso", starsLbl: "Estrellas de la intro", buysLbl: "Compras", reset: "Reiniciar progreso", resetDone: "Progreso reiniciado",
+    about: "Simply AI es una app educativa no oficial, versión demo. Claude es un producto de Anthropic. Las tareas se hacen en Claude: en claude.ai o en su app.",
+    nina: "Abuela Rosa", welcome: "Bienvenido, "
+  },
+  L: [
+    { kick: "Momento wow n.º 1", title: "Un juego en un solo mensaje", illus: "game",
+      body: "Claude puede crear juegos en el chat: basta con describirlos con palabras. Arma el tuyo y juega.",
+      nina: "«Me elegí a mí y las facturas de la luz. Hice 34 puntos. Mi nieto lleva 12: está entrenando».",
+      task: { type: "builder", min: 2, title: "Arma tu propio juego", def: [0, 0, 0],
+        groups: [
+          { t: "¿Quién atrapa?", o: [["Gato", "un gato pelirrojo"], ["Perro", "un perro alegre"], ["Abuela Rosa", "la abuela Rosa"]] },
+          { t: "¿Qué cae de rico?", o: [["Empanadas", "empanadas"], ["Manzanas", "manzanas"], ["Mandarinas", "mandarinas"]] },
+          { t: "¿Qué hay que esquivar?", o: [["Zapatillas", "zapatillas"], ["Cactus", "cactus"], ["Facturas de la luz", "facturas de la luz"]] }],
+        tpl: v => `Haz un juego sencillo aquí mismo, en el chat: ${v[0]} atrapa ${v[1]} que caen y tiene que esquivar ${v[2]} que caen. Control con el dedo en la pantalla o con las flechas. Puntos en la esquina, 3 vidas, cada minuto más rápido. Colores vivos y alegres.`,
+        steps: ["Copia el mensaje", "Abre Claude, pégalo y envíalo", "Consigue 20 puntos en el juego"],
+        fin: "¡Conseguí 20 puntos!", bonus: "Extra: escribe a Claude «Añade música y un nivel con jefe final»." } },
+    { kick: "Momento wow n.º 2", title: "Una web-tarjeta de visita en un mensaje", illus: "",
+      body: "Para ti, para tu vecino fontanero o para tu madre repostera. Escribe los datos: la vista previa y el mensaje para Claude cambian al instante.",
+      nina: "«Le hice una web a mi vecino Alex. Ahora me arregla el grifo sin esperar y gratis».",
+      task: { type: "site", min: 3, title: "Haz una web de verdad para alguien",
+        fields: [["name", "Nombre", "Alex Miller"], ["job", "A qué se dedica", "Fontanero, 20 años de experiencia"], ["city", "Ciudad", "Berlín"],
+          ["serv", "Tres servicios separados por comas", "reparación de grifos, instalación de calentadores, rescate de inundaciones"], ["contact", "Teléfono o Instagram", "+1 555 012 3456"]],
+        styles: [["Confiable", "confiable, pero con una sonrisa", "#2340E8"], ["Alegre", "alegre y colorido", "#FF6A4D"], ["Moderno", "moderno, como una cafetería", "#17142B"], ["Serio", "serio y profesional", "#3B4256"]],
+        tpl: (d, st) => `Haz una web-tarjeta de visita de una sola página: ${d.name || "mi nombre"}, ${d.job || "a qué me dedico"}, ${d.city || "mi ciudad"}. Servicios: ${d.serv || "mis servicios"}. Contacto: ${d.contact || "mi teléfono"}. Estilo: ${st}. Que también se vea bien en el móvil.`,
+        fin: "¡Mi web está lista!", bonus: "Extra: escribe «Añade una sección de opiniones y un botón de WhatsApp»." } },
+    { kick: "", title: "¿Quién es Claude? En palabras sencillas", illus: "chat",
+      body: "Claude es un asistente creado por la empresa Anthropic. Se conversa con él como en una app de mensajes. No es una persona ni un buscador: en vez de diez enlaces, responde al momento y hace el trabajo. Y no se molesta si preguntas cien veces.",
+      nina: "«¿Entonces está vivo?». — No. Pero es más educado que algunos vecinos.",
+      task: { type: "quiz", min: 1, title: "¿Quién lo hace: un buscador o Claude?", a: "Buscador", b: "Claude",
+        qs: [["Muestra diez enlaces a webs sobre sopa", "a", "Correcto: el buscador encuentra páginas. Claude escribiría la receta con tus ingredientes.", "Casi: Claude da la receta al momento; los diez enlaces son cosa del buscador."],
+          ["Escribe un brindis para la boda de Lucía", "b", "¡Correcto! El buscador encuentra brindis de otros; Claude escribe uno solo para Lucía.", "El buscador solo encuentra brindis ajenos. Escribir uno para Lucía es cosa de Claude."],
+          ["Explica la factura de la luz con palabras sencillas", "b", "¡Correcto! Incluso puedes hacerle una foto a la factura y preguntar.", "Es Claude: puedes enseñarle una foto de la factura y pedir que la explique."],
+          ["Traduce un menú en Italia y dice qué no pica", "b", "¡Correcto! Claude traduce y explica qué plato es.", "Es Claude: traduce y te cuenta qué plato es."]],
+        bonus: "Pregúntale a Claude: «¿En qué te diferencias de un buscador? Explícamelo como a una abuela»." } },
+    { kick: "", title: "Dónde encontrar a Claude", illus: "devices",
+      body: "En el ordenador: la web claude.ai. En el móvil: la app Claude en Google Play o App Store. Puedes entrar con Google. Para empezar basta el plan gratuito.",
+      nina: "«Mi contraseña de Google está en la nevera». — Rosa, mejor en una libreta. Y no en la cocina.",
+      task: { type: "check", min: 3, title: "Tu primera conversación",
+        steps: ["Abrí claude.ai o la app de Claude", "Entré con Google", "Envié el primer mensaje (está abajo)", "Recibí una respuesta con cinco ideas"],
+        nameLbl: "¿Cómo te llamas? Lo pondremos en tu primer mensaje", defName: "Rosa",
+        tpl: n => `¡Hola! Me llamo ${n}. Estoy empezando a usar la inteligencia artificial. Explícame con palabras sencillas en qué me puedes ayudar en la vida diaria: dame 5 ejemplos.`,
+        bonus: "Ya conoces oficialmente a Claude. Elige una de sus 5 ideas y escribe: «Hagamos la primera»." } },
+    { kick: "", title: "La fórmula de una buena petición", illus: "",
+      body: "Claude no lee la mente. Si pides solo «Escribe una felicitación», recibirás una postal de quiosco. Añade cinco detalles y tendrás justo lo que necesitas.",
+      nina: "«Pedí una felicitación y me dio “¡Feliz cumpleaños!”. Pero Lucía se casa. Culpa mía, no lo dije».",
+      task: { type: "builder", meter: true, min: 2, title: "Arma una petición de 5 sobre 5", def: [null, null, null, null, null],
+        groups: [
+          { t: "1. ¿Qué hacer?", o: [["Felicitación", "una felicitación"], ["Carta", "una carta"], ["Cuento", "un cuento"]] },
+          { t: "2. ¿Para quién?", o: [["Compañera Ana", "para mi compañera Ana"], ["Vecino Alex", "para mi vecino Alex"], ["Nieto David, 6", "para mi nieto David (6 años)"]] },
+          { t: "3. ¿Qué extensión?", o: [["3 frases", "3 frases"], ["5 versos con rima", "5 versos con rima"], ["1 minuto", "para leer en 1 minuto"]] },
+          { t: "4. ¿Qué tono?", o: [["Cálido", "tono cálido"], ["Con humor", "con humor"], ["Formal", "formal"]] },
+          { t: "5. ¿Qué es obligatorio?", o: [["Sobre el café", "menciona el café"], ["Sobre el gato Bigotes", "menciona al gato Bigotes"], ["Sin palabras difíciles", "sin palabras difíciles"]] }],
+        tpl: v => { const r = [v[2], v[3], v[4]].filter(Boolean); return "Escribe " + (v[0] || "algo") + (v[1] ? " " + v[1] : "") + (r.length ? ": " + r.join(", ") : "") + "."; },
+        meterV: ["Claude tendrá que adivinar", "Claude adivina a medias", "Claude adivina a medias", "Nada mal, un poco más", "¡Casi perfecta!", "Petición perfecta: Claude te entiende a la primera"],
+        bonus: "Envía esta petición a Claude y luego solo «Escribe una felicitación». Compara las respuestas." } },
+    { kick: "", title: "Si no te gusta, dilo", illus: "",
+      body: "La primera respuesta es un borrador. Se corrige con palabras, como con un sastre: aquí más estrecho, allí más largo. No hace falta empezar de nuevo.",
+      tip: "Tema nuevo, chat nuevo. Así el brindis del tío no se mezcla con una receta de sopa.",
+      nina: "«¿Le puedo decir “más corto”?». — Sí. No se ofende. No como el abuelo.",
+      task: { type: "phrases", min: 1, title: "Toca las frases y mira cómo cambia el brindis",
+        ask: "Escribe un brindis para los 60 años del tío Max",
+        base: "¡Querido tío Max! Hoy nos hemos reunido para celebrar tus 60 años. Siempre has sido el pilar de nuestra familia, un sabio consejero y el alma de cada fiesta. Recordamos cómo nos enseñaste a hacer la barbacoa, a arreglar la bici y a no rendirnos nunca… (y dos minutos más)",
+        ps: [["Más corto", "¡Por el tío Max, pilar de la familia y alma de la fiesta! ¡Feliz cumpleaños!"],
+          ["Más gracioso", "¡Por el tío Max! Que su barbacoa siempre esté jugosa y su presión nunca suba."],
+          ["Más serio", "Estimado señor Miller, reciba nuestras felicitaciones por sus 60 años. Su sabiduría y su cariño son un ejemplo para toda la familia."],
+          ["Más sencillo, para un niño", "¡Tío Max, eres bueno y divertido! ¡Feliz cumpleaños! ¡Que tengas muchísima tarta!"],
+          ["Traduce al inglés", "A toast to Uncle Max! May his barbecue always be juicy and his blood pressure never rise!"],
+          ["Dame 3 opciones", "1. ¡Por el tío Max, nuestra roca!\n2. ¡Por quien hace la mejor barbacoa de la ciudad!\n3. ¡Por 60 años de sabiduría y ni un solo día aburrido!"]],
+        bonus: "Ahora de verdad: pide a Claude un brindis para un familiar tuyo y corrígelo con dos frases." } },
+    { kick: "", title: "Qué sabe hacer y dónde tener cuidado", illus: "tiles",
+      tilesT: "Puedes pedir", tiles: ["Cartas y quejas", "Cuentos y brindis", "Presupuestos y tablas", "Traducción", "Foto de un documento", "Planes de viaje"],
+      body: "Claude es tan seguro como un tío en la barbacoa, pero a veces confunde datos. Tres reglas: comprueba lo importante, nunca escribas contraseñas y no sustituyas al médico ni al abogado.",
+      nina: "«Pregunté qué pastillas tomar para la presión. Me lo explicó todo y me mandó al médico. Igual que mi nieto».",
+      task: { type: "quiz", min: 2, title: "¿Se puede o cuidado?", a: "Se puede", b: "Cuidado",
+        qs: [["Hacer una foto a la factura de la luz y pedir que la explique", "a", "¡Se puede! Solo tapa los números personales con el dedo.", "Esto sí se puede: Claude explica bien las facturas. Solo tapa los números personales."],
+          ["Escribir la contraseña del correo para que lo «revise»", "b", "¡Correcto, nunca! Tu contraseña no la necesita nadie más que tú.", "¡Cuidado! Nunca escribas contraseñas, ni siquiera a un asistente muy educado."],
+          ["Preguntar por un medicamento y tomarlo sin consultar al médico", "b", "Correcto. Lo explica bien, pero la dosis la decide el médico.", "¡Cuidado! Claude lo explica, pero sobre medicamentos decide tu médico."],
+          ["Pedir un cuento con el nombre de tu nieto", "a", "¡Se puede! Es de lo que más le gusta.", "Es totalmente seguro, ¡adelante!"],
+          ["Enviar el número de tarjeta para calcular el presupuesto", "b", "Correcto. Para un presupuesto bastan las cantidades, nunca el número de tarjeta.", "¡Cuidado! Para el presupuesto solo hacen falta cantidades, nunca la tarjeta."],
+          ["Comprobar en el calendario una fecha que te dio", "a", "¡Se puede y se debe! Las fechas importantes hay que verificarlas.", "Eso es justo lo correcto: verifica fechas y cifras importantes."]],
+        bonus: "¡Intro completada! Úsalo sin miedo." } }
+  ],
+  life: [["Fotos y documentos", ["Fotografiar una factura y entender cada línea", "Descifrar un contrato: ¿qué dice la letra pequeña?", "Traducir un menú o un cartel en el extranjero"]],
+    ["Dinero y tablas", ["Presupuesto familiar del mes", "Lista de la compra según el menú semanal", "Comparar dos tarifas o préstamos con palabras sencillas"]],
+    ["Con la voz, sin teclado", ["Pedir una receta con las manos en la masa", "Dictar una carta en vez de escribirla"]],
+    ["Salud y hogar, sin pánico", ["Preparar preguntas para el médico", "Horario de medicamentos en una tabla", "Plan de limpieza o reparación paso a paso"]],
+    ["Familia y creatividad", ["Un cuento donde el héroe es tu nieto", "Un concurso para una fiesta familiar", "Una tarjeta de cumpleaños con un poema"]]],
+  jobs: [["Tienda y ventas", "Escribe 5 publicaciones cortas para redes sociales sobre un descuento en chaquetas de invierno: divertidas y que inviten a venir a la tienda.", "descripciones de productos, respuestas a reseñas"],
+    ["Docente", "Haz un cuestionario de 10 preguntas sobre el sistema solar para 4.º de primaria, con las respuestas al final.", "plan de clase, carta a los padres"],
+    ["Oficios y servicios", "Un cliente exige un 30% de descuento por un rayón diminuto. Escribe una respuesta educada pero firme.", "lista de precios, anuncio de servicios"],
+    ["Oficina", "Resume este informe en los 5 puntos principales para mi jefe: [pega el texto del informe].", "correos de trabajo, acta de reunión"],
+    ["Conductor y repartidor", "Ayúdame a calcular el gasto mensual en combustible: 120 km al día, 6 días a la semana, 8 litros cada 100 km.", "recurso contra una multa, plan de vacaciones"],
+    ["Cafetería y cocina", "Crea un menú del día con lo que sobró: pollo, arroz, zanahoria, nata y limón. Tres platos con precios.", "descripción del menú, cálculo de raciones"],
+    ["Huerto y granja", "¿Qué puedo plantar en un balcón con sombra y cómo cuidarlo? Responde en una lista.", "calendario de siembra, anuncio para vender la cosecha"],
+    ["Blog y redes sociales", "Dame 10 ideas de vídeos cortos sobre mi pequeña panadería.", "textos para publicaciones, plan de publicaciones"]]
+}
+};
+
+/* v2: onboarding, profession, navigation, bonus messages */
+const EXTRA = {
+ru: { welT: "Войдите — и ничего не потеряется", welS: "Регистрация занимает 10 секунд — через ваш аккаунт Google. Новый пароль придумывать не нужно.",
+  why: ["Звёзды и задания сохранятся", "Покупки откроются на любом телефоне", "Сертификат будет с вашим именем"],
+  howT: "Как это выглядит", how: ["Нажмите «Войти через Google»", "Выберите свой аккаунт в списке", "Готово — вы в приложении"], acc: "Выберите аккаунт",
+  later: "Позже", jobT: "Чем вы занимаетесь?", jobS: "Подберём задания под вашу работу. Поменять можно в любой момент в профиле.",
+  jobNone: "Не работаю / на пенсии", ready: "Готово", skip: "Пропустить", forYou: "Для вас: ", tryIt: "Попробовать",
+  profJob: "Профессия", change: "Изменить", noJob: "Не выбрана", prevLes: "Предыдущий урок", list: "Все уроки",
+  redo: "Пройти урок заново", redoDone: "Урок начат заново — звезда остаётся", bonusMsg: "Бонус-сообщение для Claude",
+  loginHow: "В рабочей версии здесь откроется окно Google со списком ваших аккаунтов — останется выбрать свой." },
+en: { welT: "Sign in — and nothing gets lost", welS: "Signing up takes 10 seconds with your Google account. No new password needed.",
+  why: ["Your stars and tasks are saved", "Purchases unlock on any phone", "Your certificate carries your name"],
+  howT: "What it looks like", how: ["Tap “Sign in with Google”", "Pick your account from the list", "Done — you’re in"], acc: "Choose an account",
+  later: "Later", jobT: "What do you do?", jobS: "We’ll pick tasks for your work. You can change it any time in your profile.",
+  jobNone: "Not working / retired", ready: "Done", skip: "Skip", forYou: "For you: ", tryIt: "Try it",
+  profJob: "Profession", change: "Change", noJob: "Not chosen", prevLes: "Previous lesson", list: "All lessons",
+  redo: "Redo this lesson", redoDone: "Lesson restarted — your star stays", bonusMsg: "Bonus message for Claude",
+  loginHow: "In the full version a Google window opens here with your accounts — you just pick yours." },
+es: { welT: "Entra y no perderás nada", welS: "Registrarte lleva 10 segundos con tu cuenta de Google. No hace falta crear otra contraseña.",
+  why: ["Se guardan tus estrellas y tareas", "Las compras se abren en cualquier móvil", "El certificado llevará tu nombre"],
+  howT: "Así se ve", how: ["Toca «Entrar con Google»", "Elige tu cuenta en la lista", "Listo, ya estás dentro"], acc: "Elige una cuenta",
+  later: "Más tarde", jobT: "¿A qué te dedicas?", jobS: "Elegiremos tareas para tu trabajo. Puedes cambiarlo cuando quieras en tu perfil.",
+  jobNone: "No trabajo / jubilado", ready: "Listo", skip: "Omitir", forYou: "Para ti: ", tryIt: "Probar",
+  profJob: "Profesión", change: "Cambiar", noJob: "Sin elegir", prevLes: "Lección anterior", list: "Todas las lecciones",
+  redo: "Repetir la lección", redoDone: "Lección reiniciada: la estrella se queda", bonusMsg: "Mensaje extra para Claude",
+  loginHow: "En la versión completa aquí se abre una ventana de Google con tus cuentas: solo eliges la tuya." }
+};
+const BP = {
+ru: ["Добавь музыку и уровень с боссом.", "Добавь раздел с отзывами и кнопку WhatsApp.", "Чем ты отличаешься от поисковика? Объясни, как бабушке.", "Давай сделаем первую.", "Напиши поздравление.", "Напиши тост на день рождения моего брата: тёплый, с одной шуткой, на 1 минуту.", ""],
+en: ["Add music and a boss level.", "Add a reviews section and a WhatsApp button.", "How are you different from a search engine? Explain it like you would to a grandma.", "Let’s do the first one.", "Write a congratulation.", "Write a birthday toast for my brother: warm, one joke, 1 minute long.", ""],
+es: ["Añade música y un nivel con jefe final.", "Añade una sección de opiniones y un botón de WhatsApp.", "¿En qué te diferencias de un buscador? Explícamelo como a una abuela.", "Hagamos la primera.", "Escribe una felicitación.", "Escribe un brindis de cumpleaños para mi hermano: cálido, con un chiste, de 1 minuto.", ""]
+};
+for (const l of Object.keys(C)) { Object.assign(C[l].ui, EXTRA[l]); C[l].L.forEach((les, i) => { les.task.bp = BP[l][i]; }); }
+
+{
+const LANGS = [["ru", "Русский"], ["en", "English"], ["es", "Español"]];
+const KEY = "simplyai.v2";
+const view = document.getElementById("view"), navEl = document.getElementById("nav"),
+  sheetEl = document.getElementById("sheet"), toastEl = document.getElementById("toast");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+
+/* onb: 0 = show sign-in intro, 1 = pick profession, 2 = done. job: -1 = not working, null = not chosen */
+let S = { lang: null, onb: 0, user: null, paid: false, jobs: {}, stars: {}, page: "home", les: 0, lastLes: null,
+  tab: "life", job: null, open: 0, tasks: {}, pos: {} };
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
+if (S.lang && !C[S.lang]) S.lang = null;
+if (!S.tasks || typeof S.tasks !== "object") S.tasks = {};
+if (!S.pos || typeof S.pos !== "object") S.pos = {};
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+let T = (S.lang && S.tasks[S.lang]) || {};
+const saveT = () => { if (S.lang) { S.tasks[S.lang] = T; save(); } };
+let H = [], sheet = null;
+const cc = () => C[S.lang || "ru"], U = () => cc().ui;
+const NL = () => cc().L.length;
+const starsN = () => cc().L.filter((_, i) => S.stars[i]).length;
+const jobIdx = () => (S.job !== null && S.job >= 0 && S.job < cc().jobs.length) ? S.job : 0;
+
+/* ---------- pictures ---------- */
+const NINA = '<svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="9" r="7" fill="#C9C4D6"/><circle cx="24" cy="27" r="17" fill="#C9C4D6"/><circle cx="24" cy="29" r="14" fill="#FFDCC7"/><circle cx="19" cy="28" r="4.5" fill="none" stroke="#17142B" stroke-width="2"/><circle cx="29" cy="28" r="4.5" fill="none" stroke="#17142B" stroke-width="2"/><path d="M23.5 28h1" stroke="#17142B" stroke-width="2"/><path d="M20 36q4 3 8 0" stroke="#17142B" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+const SPK = (x, y, s, c) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0-10 2.5-2.5 10 0 2.5 2.5 0 10-2.5 2.5-10 0-2.5-2.5Z" fill="${c}"/>`;
+const coverSvg = () => `<svg viewBox="0 40 346 290" aria-hidden="true"><circle cx="300" cy="40" r="70" fill="#4A64FF"/><circle cx="40" cy="300" r="90" fill="#2B47F2"/>${SPK(262, 111, 1.4, "#FFC83D")}${SPK(40, 72, 1, "#FFC83D")}<ellipse cx="96" cy="318" rx="80" ry="10" fill="#1A33C9"/><path d="M30 330c0-60 30-92 66-92s66 32 66 92z" fill="#FF6A4D"/><path d="M70 250l26 24 26-24" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="96" cy="150" r="22" fill="#D6D1E3"/><circle cx="96" cy="200" r="52" fill="#D6D1E3"/><circle cx="96" cy="206" r="44" fill="#FFDCC7"/><circle cx="80" cy="202" r="12" fill="#FFFFFF" fill-opacity=".35" stroke="#17142B" stroke-width="4"/><circle cx="112" cy="202" r="12" fill="#FFFFFF" fill-opacity=".35" stroke="#17142B" stroke-width="4"/><path d="M92 202h8" stroke="#17142B" stroke-width="4"/><circle cx="80" cy="203" r="3.5" fill="#17142B"/><circle cx="112" cy="203" r="3.5" fill="#17142B"/><path d="M84 228q12 9 24 0" stroke="#17142B" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="66" cy="222" r="6" fill="#FF9C86"/><circle cx="126" cy="222" r="6" fill="#FF9C86"/><g transform="rotate(-12 181 284)"><rect x="150" y="236" width="62" height="96" rx="12" fill="#17142B"/><rect x="157" y="246" width="48" height="72" rx="6" fill="#FFC83D"/></g></svg>`;
+const gameSvg = () => `<svg viewBox="0 0 346 220" role="img" aria-label="game"><rect width="346" height="220" fill="#17142B"/><circle cx="40" cy="30" r="2" fill="#fff" opacity=".6"/><circle cx="290" cy="60" r="2" fill="#fff" opacity=".6"/><circle cx="120" cy="90" r="1.5" fill="#fff" opacity=".5"/><rect x="14" y="12" width="104" height="30" rx="15" fill="#2340E8"/><text x="66" y="32" text-anchor="middle" fill="#fff" font-family="Golos Text, sans-serif" font-size="14" font-weight="600">${esc(U().score)}: 12</text><path d="M284 22c-4-6-12-2-9 4l9 9 9-9c3-6-5-10-9-4z" fill="#FF6A4D"/><path d="M306 22c-4-6-12-2-9 4l9 9 9-9c3-6-5-10-9-4z" fill="#FF6A4D"/><path d="M328 22c-4-6-12-2-9 4l9 9 9-9c3-6-5-10-9-4z" fill="#4A4560"/><ellipse cx="80" cy="84" rx="20" ry="11" fill="#C9772E"/><path d="M62 82q18-14 36 0" fill="#F2B66B"/><ellipse cx="250" cy="120" rx="20" ry="11" fill="#C9772E"/><path d="M232 118q18-14 36 0" fill="#F2B66B"/><g transform="rotate(-24 170 70)"><path d="M146 64c0-12 50-14 56-2 4 10-6 16-28 16-20 0-28-4-28-14z" fill="#FF6A4D"/><path d="M152 62q12-12 24 0" fill="none" stroke="#FFC83D" stroke-width="6" stroke-linecap="round"/></g><ellipse cx="176" cy="210" rx="56" ry="6" fill="#000" opacity=".35"/><ellipse cx="176" cy="188" rx="38" ry="22" fill="#FF9A3D"/><circle cx="176" cy="160" r="22" fill="#FF9A3D"/><path d="M158 148l2-20 14 12zM194 148l-2-20-14 12z" fill="#FF9A3D"/><ellipse cx="168" cy="160" rx="3" ry="4.5" fill="#17142B"/><ellipse cx="184" cy="160" rx="3" ry="4.5" fill="#17142B"/><path d="M172 168q4 4 8 0" stroke="#17142B" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M150 164h12M150 170h12M190 164h12M190 170h12" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M214 186q22-8 18-30" stroke="#FF9A3D" stroke-width="8" fill="none" stroke-linecap="round"/></svg>`;
+const chatSvg = () => `<svg viewBox="0 0 346 210" aria-hidden="true"><rect width="346" height="210" fill="#FFC83D"/><circle cx="300" cy="30" r="60" fill="#FFD666"/><ellipse cx="190" cy="204" rx="90" ry="8" fill="#E0A800"/><rect x="130" y="18" width="120" height="190" rx="18" fill="#17142B"/><rect x="138" y="30" width="104" height="170" rx="10" fill="#fff"/><rect x="176" y="42" width="58" height="22" rx="11" fill="#2340E8"/><rect x="146" y="72" width="76" height="34" rx="11" fill="#F1F2FA"/><rect x="152" y="80" width="56" height="5" rx="2.5" fill="#B9BDD6"/><rect x="152" y="91" width="40" height="5" rx="2.5" fill="#B9BDD6"/><rect x="188" y="114" width="46" height="22" rx="11" fill="#2340E8"/><rect x="146" y="144" width="84" height="44" rx="11" fill="#F1F2FA"/><rect x="152" y="152" width="64" height="5" rx="2.5" fill="#B9BDD6"/><rect x="152" y="163" width="70" height="5" rx="2.5" fill="#B9BDD6"/><rect x="152" y="174" width="34" height="5" rx="2.5" fill="#B9BDD6"/><circle cx="64" cy="70" r="16" fill="#D6D1E3"/><circle cx="64" cy="112" r="40" fill="#D6D1E3"/><circle cx="64" cy="117" r="33" fill="#FFDCC7"/><circle cx="52" cy="114" r="9" fill="#fff" fill-opacity=".4" stroke="#17142B" stroke-width="3"/><circle cx="76" cy="114" r="9" fill="#fff" fill-opacity=".4" stroke="#17142B" stroke-width="3"/><path d="M61 114h6" stroke="#17142B" stroke-width="3"/><circle cx="52" cy="115" r="2.5" fill="#17142B"/><circle cx="76" cy="115" r="2.5" fill="#17142B"/><ellipse cx="64" cy="134" rx="6" ry="5" fill="#17142B"/><path d="M24 210c0-38 18-54 40-54s40 16 40 54z" fill="#FF6A4D"/><text x="104" y="62" fill="#17142B" font-family="Unbounded, sans-serif" font-size="30" font-weight="800">?</text>${SPK(286, 138, 1.3, "#fff")}</svg>`;
+const devSvg = () => `<svg viewBox="0 0 346 200" aria-hidden="true"><rect width="346" height="200" fill="#2340E8"/><circle cx="40" cy="40" r="70" fill="#3552FF"/><ellipse cx="160" cy="186" rx="140" ry="8" fill="#1A33C9"/><rect x="40" y="40" width="200" height="126" rx="12" fill="#17142B"/><rect x="50" y="50" width="180" height="106" rx="6" fill="#fff"/><rect x="50" y="50" width="180" height="20" rx="6" fill="#F1F2FA"/><rect x="60" y="56" width="90" height="8" rx="4" fill="#fff" stroke="#C9C6D6"/><text x="64" y="63" fill="#2340E8" font-family="Golos Text, sans-serif" font-size="8" font-weight="600">claude.ai</text><rect x="62" y="82" width="110" height="7" rx="3.5" fill="#E6E8F5"/><rect x="62" y="96" width="80" height="7" rx="3.5" fill="#E6E8F5"/><rect x="62" y="128" width="156" height="18" rx="9" fill="#fff" stroke="#2340E8" stroke-width="2"/><circle cx="208" cy="137" r="6" fill="#FF6A4D"/><path d="M20 166h240l-16 16H36z" fill="#2B2640"/><rect x="252" y="58" width="68" height="128" rx="14" fill="#17142B"/><rect x="258" y="68" width="56" height="108" rx="8" fill="#FFC83D"/><rect x="264" y="80" width="34" height="12" rx="6" fill="#fff"/><rect x="276" y="98" width="32" height="12" rx="6" fill="#2340E8"/><rect x="264" y="116" width="40" height="18" rx="6" fill="#fff"/><rect x="262" y="158" width="48" height="12" rx="6" fill="#fff"/>${SPK(300, 30, 1.1, "#FFC83D")}</svg>`;
+/* a generic account picker (not a copy of any real screen): phone, three account rows, a tap */
+const accSvg = () => `<svg viewBox="0 0 346 220" aria-hidden="true"><rect width="346" height="220" fill="#FFC83D"/><circle cx="40" cy="190" r="70" fill="#FFD666"/><rect x="98" y="14" width="150" height="206" rx="20" fill="#17142B"/><rect x="106" y="26" width="134" height="194" rx="12" fill="#fff"/><text x="173" y="52" text-anchor="middle" fill="#17142B" font-family="Golos Text, sans-serif" font-size="11" font-weight="600">${esc(U().acc)}</text>${[0, 1, 2].map(r => `<rect x="116" y="${66 + r * 44}" width="114" height="36" rx="10" fill="${r ? "#F1F2FA" : "#fff"}" ${r ? "" : 'stroke="#2340E8" stroke-width="3"'}/><circle cx="134" cy="${84 + r * 44}" r="10" fill="${["#FF6A4D", "#2340E8", "#C9C4D6"][r]}"/><rect x="150" y="${77 + r * 44}" width="${[64, 52, 58][r]}" height="6" rx="3" fill="#B9BDD6"/><rect x="150" y="${88 + r * 44}" width="${[44, 60, 40][r]}" height="5" rx="2.5" fill="#D9DCEB"/>`).join("")}<circle cx="214" cy="96" r="18" fill="#2340E8" opacity=".18"/><circle cx="214" cy="96" r="8" fill="#2340E8"/>${SPK(290, 40, 1.3, "#fff")}${SPK(60, 50, 0.9, "#fff")}</svg>`;
+const TICONS = ['<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>', '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/>', '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M10 4v16"/>', '<path d="M4 5h16v11H9l-5 4z"/><path d="M9 9h6M9 12h4"/>', '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>', '<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'];
+const ico = p => `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFC83D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const LOCK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="locked"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+const NAVI = { home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>', course: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 8h6"/>', profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>' };
+
+/* ---------- task state (saved, survives leaving the lesson and closing the app) ---------- */
+function initTask(k) {
+  if (k.type === "builder") return { sel: k.def.slice() };
+  if (k.type === "site") { const d = {}; k.fields.forEach(f => d[f[0]] = f[2]); return { d, st: 0 }; }
+  if (k.type === "quiz") return { ans: {} };
+  if (k.type === "check") return { done: k.steps.map(() => false), name: "" };
+  return { cur: -1, seen: {} };
+}
+const ts = i => T[i] || (T[i] = initTask(cc().L[i].task));
+function isDone(i) {
+  const k = cc().L[i].task, s = ts(i);
+  if (k.type === "builder") return k.meter ? s.sel.every(x => x !== null) : !!s.fin;
+  if (k.type === "site") return !!s.fin;
+  if (k.type === "quiz") return Object.keys(s.ans).length === k.qs.length;
+  if (k.type === "check") return s.done.every(Boolean);
+  return Object.keys(s.seen).length === k.ps.length;
+}
+function promptOf(i) {
+  const k = cc().L[i].task, s = ts(i);
+  if (k.type === "builder") return k.tpl(s.sel.map((x, g) => x === null ? "" : k.groups[g].o[x][1]));
+  if (k.type === "site") return k.tpl(s.d, k.styles[s.st][1]);
+  if (k.type === "check") return k.tpl(s.name.trim() || k.defName);
+  return "";
+}
+function changed(i) { saveT(); if (isDone(i) && !S.stars[i]) { S.stars[i] = true; save(); toast("★ " + U().starGot); } }
+
+/* ---------- navigation with history: Back always goes one step back ---------- */
+function leaving() { if (S.page === "lesson") S.pos[S.les] = window.scrollY; }
+function go(page, les, opts) {
+  leaving();
+  H.push({ page: S.page, les: S.les }); if (H.length > 40) H.shift();
+  S.page = page; if (les !== undefined && les !== null) S.les = les;
+  if (page === "lesson") S.lastLes = S.les;
+  save(); render(); restore(opts && opts.resume);
+}
+function restore(resume) { window.scrollTo(0, resume && S.page === "lesson" ? (S.pos[S.les] || 0) : 0); }
+function back() {
+  if (sheet) { sheet = null; renderSheet(); return true; }
+  if (S.lang && S.onb < 2) return false;
+  leaving();
+  const prev = H.pop();
+  if (prev) { S.page = prev.page; S.les = prev.les; if (S.page === "lesson") S.lastLes = S.les; save(); render(); restore(true); return true; }
+  if (S.page !== "home") { S.page = "home"; save(); render(); restore(false); return true; }
+  return false;
+}
+window.appBack = back;
+
+/* ---------- helpers ---------- */
+function toast(m) { toastEl.textContent = m; toastEl.classList.add("on"); clearTimeout(toast.h); toast.h = setTimeout(() => toastEl.classList.remove("on"), 2200); }
+function copyText(txt) {
+  const ok = () => toast(U().copied + " ✓"), fail = () => toast(U().copyFail);
+  try { if (window.AndroidBridge && window.AndroidBridge.copy) { window.AndroidBridge.copy(txt); ok(); return; } } catch (e) {}
+  const legacy = () => { try { const ta = document.createElement("textarea"); ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); const r = document.execCommand("copy"); ta.remove(); r ? ok() : fail(); } catch (e) { fail(); } };
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(ok, legacy); return; } } catch (e) {}
+  legacy();
+}
+const chip = (label, on, attrs) => `<button class="chip" aria-pressed="${on}" ${attrs}>${esc(label)}</button>`;
+const openBtn = () => `<a class="btn alt sm" href="https://claude.ai/new" target="_blank" rel="noopener">${esc(U().open)}</a>`;
+const promptBox = (txt, act) => `<div class="prompt"><span class="lbl">${esc(U().yourMsg)}</span><p id="pr">${esc(txt)}</p><div class="chips"><button class="btn cob sm" data-act="${act}">${esc(U().copy)}</button>${openBtn()}</div></div>`;
+function win(k) {
+  const u = U();
+  return `<div class="win"><b>★ ${esc(u.starGot)}</b> ${esc(k.bonus)}${k.bp ? `<div class="bonus"><span class="lbl">${esc(u.bonusMsg)}</span><p>${esc(k.bp)}</p><div class="chips"><button class="btn sm" data-act="copyBonus">${esc(u.copy)}</button>${openBtn()}</div></div>` : ""}</div>`;
+}
+function nextIdx() { for (let i = 0; i < NL(); i++) if (!S.stars[i]) return i; return -1; }
+/* the lesson "Continue" opens: the one you left unfinished, else the first unfinished */
+function resumeIdx() { if (S.lastLes !== null && S.lastLes !== undefined && S.lastLes < NL() && !S.stars[S.lastLes]) return S.lastLes; return nextIdx(); }
+function ctaBtn(cls) {
+  const u = U(), r = resumeIdx(), n = starsN();
+  if (r < 0) return `<button class="btn ${cls}" data-act="les" data-i="0">${esc(u.again)}</button>`;
+  const resume = r === S.lastLes ? "1" : "";
+  return `<button class="btn ${cls}" data-act="les" data-i="${r}" data-resume="${resume}">${esc(n || resume ? u.cont + (r + 1) : u.start)}</button>`;
+}
+
+/* ---------- tasks ---------- */
+function taskHTML(i) {
+  const k = cc().L[i].task, s = ts(i), u = U(), done = isDone(i);
+  let cnt = "";
+  if (k.type === "quiz") { const r = k.qs.filter((q, qi) => s.ans[qi] === q[1]).length; cnt = u.right(r, k.qs.length); }
+  if (k.type === "check") cnt = s.done.filter(Boolean).length + " / " + k.steps.length;
+  if (k.type === "phrases") cnt = u.tried(Object.keys(s.seen).length, k.ps.length);
+  let h = `<section class="task"><div class="row"><span class="badge">${esc(u.mini)} · ${k.min} ${esc(u.min)}</span>${cnt ? `<span class="cnt">${esc(cnt)}</span>` : ""}</div><h2>${esc(k.title)}</h2>`;
+  if (k.type === "builder") {
+    if (k.meter) { const n = s.sel.filter(x => x !== null).length; h += `<div class="meter"><div class="sp"><b>${esc(u.accuracy)}</b><b class="price">${n}/5</b></div><div class="bar"><i style="width:${n * 20}%"></i></div><span>${esc(k.meterV[n])}</span></div>`; }
+    k.groups.forEach((g, gi) => { h += `<div class="lbl">${esc(g.t)}</div><div class="chips">${g.o.map((o, oi) => chip(o[0], s.sel[gi] === oi, `data-act="sel" data-g="${gi}" data-o="${oi}"`)).join("")}</div>`; });
+    h += promptBox(promptOf(i), "copy");
+    if (k.steps) h += `<div class="steps">${k.steps.map((t, n) => `<span><b>${n + 1}.</b> ${esc(t)}</span>`).join("")}</div>`;
+    if (!k.meter && !done) h += `<button class="btn sun wide" data-act="fin">${esc(k.fin)}</button>`;
+  }
+  if (k.type === "site") {
+    const st = k.styles[s.st], sv = (s.d.serv || "").split(",").map(x => x.trim()).filter(Boolean).slice(0, 5);
+    h += `<div class="site" aria-hidden="true"><div class="w"><div class="bz"><i></i><i></i><i></i>${esc(u.preview)}</div><div class="hd" style="background:${st[2]}"><b id="pvN">${esc(s.d.name)}</b><span id="pvS">${esc([s.d.job, s.d.city].filter(Boolean).join(" · "))}</span></div><div class="bd"><div class="chips" id="pvV">${sv.map(x => `<span class="pill">${esc(x)}</span>`).join("")}</div><span class="call" id="pvC">${esc(u.contact)}: ${esc(s.d.contact)}</span></div></div></div>`;
+    k.fields.forEach(f => { h += `<div><label for="f_${f[0]}">${esc(f[1])}</label><input id="f_${f[0]}" data-f="${f[0]}" value="${esc(s.d[f[0]])}" autocomplete="off"></div>`; });
+    h += `<div class="lbl">${esc(u.styleLbl)}</div><div class="chips">${k.styles.map((x, xi) => chip(x[0], s.st === xi, `data-act="style" data-o="${xi}"`)).join("")}</div>`;
+    h += promptBox(promptOf(i), "copy");
+    if (!done) h += `<button class="btn sun wide" data-act="fin">${esc(k.fin)}</button>`;
+  }
+  if (k.type === "quiz") {
+    k.qs.forEach((q, qi) => {
+      const v = s.ans[qi], ok = v === q[1];
+      h += `<div class="q"><b>${esc(q[0])}</b><div class="two">${chip(k.a, v === "a", `data-act="ans" data-q="${qi}" data-v="a"`)}${chip(k.b, v === "b", `data-act="ans" data-q="${qi}" data-v="b"`)}</div>${v ? `<div class="fb ${ok ? "ok" : "bad"}">${esc(ok ? q[2] : q[3])}</div>` : ""}</div>`;
+    });
+  }
+  if (k.type === "check") {
+    const n = s.done.filter(Boolean).length;
+    h += `<div class="bar"><i style="width:${n / k.steps.length * 100}%"></i></div>`;
+    k.steps.forEach((t, si) => { h += `<button class="chk" aria-pressed="${s.done[si]}" data-act="tog" data-s="${si}"><span class="bx">${s.done[si] ? "✓" : ""}</span><span>${esc(t)}</span></button>`; });
+    h += `<div><label for="f_cname">${esc(k.nameLbl)}</label><input id="f_cname" data-f="cname" value="${esc(s.name)}" placeholder="${esc(k.defName)}" autocomplete="given-name"></div>`;
+    h += promptBox(promptOf(i), "copy");
+  }
+  if (k.type === "phrases") {
+    h += `<div class="chat"><div class="me">${esc(s.cur < 0 ? k.ask : k.ps[s.cur][0])}</div><div class="ai">${esc(s.cur < 0 ? k.base : k.ps[s.cur][1])}</div></div>`;
+    h += `<div class="lbl">${esc(u.phrasesLbl)}</div><div class="chips">${k.ps.map((p, pi) => chip(p[0], s.cur === pi, `data-act="ph" data-o="${pi}"`)).join("")}</div>`;
+  }
+  if (done) h += win(k) + `<button class="link" data-act="redo">↺ ${esc(u.redo)}</button>`;
+  return h + "</section>";
+}
+function live() {
+  const i = S.les, k = cc().L[i].task, s = ts(i), pr = document.getElementById("pr");
+  if (pr) pr.textContent = promptOf(i);
+  if (k.type === "site") {
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set("pvN", s.d.name); set("pvS", [s.d.job, s.d.city].filter(Boolean).join(" · ")); set("pvC", U().contact + ": " + s.d.contact);
+    const pv = document.getElementById("pvV");
+    if (pv) pv.innerHTML = (s.d.serv || "").split(",").map(x => x.trim()).filter(Boolean).slice(0, 5).map(x => `<span class="pill">${esc(x)}</span>`).join("");
+  }
+}
+
+/* ---------- pages ---------- */
+function topBar() { return `<header class="top"><span class="brand">Simply <b>AI</b></span><span class="starc">★ ${starsN()} / ${NL()}</span></header>`; }
+function pageLang() {
+  return `<div class="pg" style="min-height:100vh;justify-content:center"><div class="hero"><div class="cover">${coverSvg()}</div><h1>Simply AI</h1><p>Выберите язык · Choose your language · Elige tu idioma</p></div><div class="langs">${LANGS.map(l => `<button class="btn alt wide" data-act="lang" data-l="${l[0]}">${esc(l[1])}</button>`).join("")}</div></div>`;
+}
+function pageWelcome() {
+  const u = U();
+  if (S.user) return pageJob();
+  return `<div class="pg"><div class="steps-top"><span class="dotstep on"></span><span class="dotstep"></span></div>
+  <h1>${esc(u.welT)}</h1><p>${esc(u.welS)}</p>
+  <div class="box">${u.why.map(w => `<div class="why"><span class="dot">✓</span><span>${esc(w)}</span></div>`).join("")}</div>
+  <h2>${esc(u.howT)}</h2><div class="illu">${accSvg()}</div>
+  <ol class="how">${u.how.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+  <button class="btn cob wide" data-act="login" data-then="onb"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>
+  <button class="btn alt wide" data-act="later">${esc(u.later)}</button></div>`;
+}
+function pageJob() {
+  const u = U(), onb = S.onb < 2;
+  return `<div class="pg">${onb ? `<div class="steps-top"><span class="dotstep"></span><span class="dotstep on"></span></div>` : `<div class="les-top"><button class="round" data-act="back" aria-label="${esc(u.back)}">‹</button></div>`}
+  <h1>${esc(u.jobT)}</h1><p>${esc(u.jobS)}</p>
+  <div class="chips">${cc().jobs.map((j, ji) => chip(j[0], S.job === ji, `data-act="pickJob" data-o="${ji}"`)).join("")}${chip(u.jobNone, S.job === -1, `data-act="pickJob" data-o="-1"`)}</div>
+  ${S.job !== null && S.job >= 0 ? `<div class="prompt"><span class="lbl">${esc(u.forYou + cc().jobs[S.job][0])}</span><p>${esc(cc().jobs[S.job][1])}</p></div>` : ""}
+  <button class="btn sun wide" data-act="jobDone" ${S.job === null ? "disabled" : ""}>${esc(u.ready)}</button>
+  ${onb ? `<button class="btn alt wide" data-act="jobSkip">${esc(u.skip)}</button>` : ""}</div>`;
+}
+function pageHome() {
+  const u = U(), L = cc().L, n = starsN();
+  const hasJob = S.job !== null && S.job >= 0, j = hasJob ? cc().jobs[S.job] : null;
+  const tease = hasJob
+    ? `<section class="coral"><span class="lbl" style="color:#17142B">${esc(u.forYou + j[0])}</span><h2>${esc(u.tryNow)}</h2><p>${esc(j[1])}</p><button class="btn" data-act="go" data-p="course" data-tab="work">${esc(u.tryIt)}</button></section>`
+    : `<section class="coral"><h2>${esc(u.teaseT)}</h2><p>${esc(u.teaseB)}</p><button class="btn" data-act="go" data-p="job">${esc(u.teaseBtn)}</button></section>`;
+  return topBar() + `<div class="pg"><section class="hero"><div class="cover">${coverSvg()}<div class="bubs"><div class="bub">${esc(u.bub1)}</div><div class="bub y">${esc(u.bub2)}</div></div></div><h1>${esc(u.homeT)}</h1><p>${esc(u.homeS)}</p>${ctaBtn("sun")}</section>
+  <div class="sp"><b>${esc(u.introLbl)}</b><span class="lbl">${esc(u.done(n, L.length))}</span></div><div class="bar"><i style="width:${n / L.length * 100}%"></i></div>
+  ${L.map((l, i) => `<button class="li ${S.stars[i] ? "done" : ""}" data-act="les" data-i="${i}"><span class="num">${S.stars[i] ? "★" : i + 1}</span><span class="tx"><b>${esc(l.title)}</b><small>${esc(u.mini)} · ${l.task.min} ${esc(u.min)}</small></span><span aria-hidden="true">›</span></button>`).join("")}
+  ${tease}</div>`;
+}
+function pageLesson() {
+  const u = U(), i = S.les, l = cc().L[i], total = NL();
+  let ill = "";
+  if (l.illus === "game") ill = `<div class="illu">${gameSvg()}</div>`;
+  if (l.illus === "chat") ill = `<div class="illu">${chatSvg()}</div>`;
+  if (l.illus === "devices") ill = `<div class="illu">${devSvg()}</div>`;
+  if (l.illus === "tiles") ill = `<div class="tiles"><b style="font-family:var(--hf)">${esc(l.tilesT)}</b><div class="g">${l.tiles.map((t, ti) => `<div>${ico(TICONS[ti])}${esc(t)}</div>`).join("")}</div></div>`;
+  return `<div class="pg"><div class="les-top">${i > 0 ? `<button class="round" data-act="prev" aria-label="${esc(u.prevLes)}" title="${esc(u.prevLes)}">‹</button>` : ""}<span style="flex:none">${esc(u.lesson(i + 1, total))}</span><div class="bar" style="flex:1"><i style="width:${(i + 1) / total * 100}%"></i></div><button class="pillbtn" data-act="go" data-p="home">${esc(u.list)}</button></div>
+  ${ill}${l.kick ? `<span class="badge" style="font-size:14px;padding:4px 12px">${esc(l.kick)}</span>` : ""}<h1>${S.stars[i] ? `<span class="got" aria-label="★">★</span> ` : ""}${esc(l.title)}</h1><p>${esc(l.body)}</p>
+  <div id="task">${taskHTML(i)}</div>
+  ${l.tip ? `<div class="tip"><span class="dot">i</span><span>${esc(l.tip)}</span></div>` : ""}
+  <div class="nina">${NINA}<div><b>${esc(u.nina)}:</b> ${esc(l.nina)}</div></div>
+  <div class="two">${i > 0 ? `<button class="btn alt" data-act="prev">‹ ${esc(u.back)}</button>` : ""}<button class="btn" style="flex:1" data-act="next">${esc(i < total - 1 ? u.next : u.toCourse)}</button></div></div>`;
+}
+function pageCourse() {
+  const u = U(), C2 = cc(), n = starsN(), life = S.tab !== "work";
+  let h = topBar() + `<div class="pg"><section class="hero"><span style="font-size:14px;color:#DDE3FF">${esc(u.courseKick)}</span><h1>${esc(u.courseT)}</h1><div class="stats">${u.st.map(x => `<div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div></section>
+  <div class="box"><div class="sp"><b>${esc(u.introLbl)}</b><span class="lbl">${esc(u.done(n, NL()))}</span></div><div class="bar"><i style="width:${n / NL() * 100}%"></i></div>${ctaBtn("sm alt")}</div>
+  <div class="tabs"><button aria-pressed="${life}" data-act="tab" data-t="life">${esc(u.tabLife)}</button><button aria-pressed="${!life}" data-act="tab" data-t="work">${esc(u.tabWork)}</button></div>`;
+  if (life) {
+    h += `<div class="sp" style="align-items:center"><span>${esc(u.lifeDesc)}</span>${S.paid ? `<b class="cnt">${esc(u.owned)}</b>` : `<button class="btn sun sm" data-act="buy" data-k="life">${esc(u.buy)} · $4.99</button>`}</div>`;
+    C2.life.forEach((m, mi) => {
+      const on = S.open === mi;
+      h += `<div class="mod ${on ? "on" : ""}"><button data-act="mod" data-o="${mi}" aria-expanded="${on}"><span class="num">${mi + 1}</span><span class="tx" style="flex:1"><b style="display:block">${esc(m[0])}</b><small style="color:var(--mute)">15 ${esc(u.min)} · ${m[1].length} ★</small></span><span aria-hidden="true">${S.paid ? "✓" : LOCK}</span></button>${on ? `<ul>${m[1].map(t => `<li>${esc(t)}</li>`).join("")}</ul><div class="st">${esc(S.paid ? u.soon : u.locked)}</div>` : ""}</div>`;
+    });
+    h += `<div class="cert ${S.paid ? "" : "lock"}"><span class="lbl">${esc(u.certT)}</span><span class="nm">«${esc(u.certName)}»</span><span>${esc(u.certFor)}: <b>${esc(S.user || u.guest)}</b></span><span class="lbl">${esc(S.paid ? new Date().toLocaleDateString(S.lang) : u.certLocked)}</span></div>`;
+  } else {
+    const ji = jobIdx(), j = C2.jobs[ji];
+    h += `<p>${esc(u.workDesc)}</p><div class="lbl">${esc(u.whatJob)}</div><div class="chips">${C2.jobs.map((x, xi) => chip(x[0], ji === xi, `data-act="job" data-o="${xi}"`)).join("")}</div>
+    <section class="task"><span class="badge">${esc(u.tryNow)}</span><h2>${esc(j[0])}</h2>${promptBox(j[1], "copyJob")}<span class="lbl">${esc(u.inPack + j[2])}</span>
+    ${S.jobs[ji] ? `<b class="cnt" style="white-space:normal">${esc(u.jobOwned)}</b>` : `<button class="btn sun" data-act="buy" data-k="job">${esc(u.buy)} · $0.99</button>`}</section>`;
+  }
+  return h + `<div class="nina">${NINA}<div><b>${esc(u.updT)}</b><br>${esc(u.updB)}</div></div></div>`;
+}
+function pageProfile() {
+  const u = U(), buys = (S.paid ? 1 : 0) + Object.keys(S.jobs).length;
+  const jobName = S.job === -1 ? u.jobNone : (S.job !== null && cc().jobs[S.job] ? cc().jobs[S.job][0] : u.noJob);
+  return topBar() + `<div class="pg"><div class="box"><div class="prof"><span class="ava">${esc(S.user ? S.user.trim().charAt(0).toUpperCase() : "?")}</span><div><b style="font-size:18px">${esc(S.user || u.guest)}</b><br><span class="lbl">${esc(S.user ? u.signedSub : u.guestSub)}</span></div></div>
+  ${S.user ? `<button class="btn alt sm" data-act="logout">${esc(u.logout)}</button>` : `<button class="btn cob" data-act="login"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>`}</div>
+  <div class="box"><div class="sp" style="align-items:center"><div><b>${esc(u.profJob)}</b><br><span class="lbl">${esc(jobName)}</span></div><button class="btn alt sm" data-act="go" data-p="job">${esc(u.change)}</button></div></div>
+  <div class="box"><b>${esc(u.langT)}</b><div class="chips">${LANGS.map(l => chip(l[1], S.lang === l[0], `data-act="lang" data-l="${l[0]}"`)).join("")}</div></div>
+  <div class="box"><b>${esc(u.statsT)}</b><div class="sp"><span>${esc(u.starsLbl)}</span><b>★ ${starsN()} / ${NL()}</b></div><div class="sp"><span>${esc(u.buysLbl)}</span><b>${buys}</b></div><button class="btn alt sm" data-act="reset">${esc(u.reset)}</button></div>
+  <p class="lbl" style="font-weight:400">${esc(u.about)}</p></div>`;
+}
+function renderNav() {
+  const show = S.lang && S.onb >= 2 && ["home", "course", "profile"].includes(S.page);
+  navEl.hidden = !show; if (!show) return;
+  const u = U();
+  navEl.innerHTML = `<div>${[["home", u.navHome], ["course", u.navCourse], ["profile", u.navProfile]].map(x => `<button data-act="tabnav" data-p="${x[0]}" ${S.page === x[0] ? 'aria-current="page"' : ""}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[x[0]]}</svg>${esc(x[1])}</button>`).join("")}</div>`;
+}
+function renderSheet() {
+  if (!sheet) { sheetEl.innerHTML = ""; return; }
+  const u = U();
+  let h = "";
+  if (sheet.kind === "login") h = `<h2 id="shT">${esc(u.loginT)}</h2><p>${esc(u.welS)}</p><ol class="how">${u.how.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="lbl" style="font-weight:400">${esc(u.loginHow)} ${esc(u.loginB)}</p><div><label for="lgN">${esc(u.yourName)}</label><input id="lgN" autocomplete="given-name"></div><button class="btn cob wide" data-act="doLogin">${esc(u.loginGo)}</button><button class="btn alt wide" data-act="close">${esc(u.cancel)}</button>`;
+  if (sheet.kind === "pay") {
+    const ji = jobIdx(), item = sheet.k === "life" ? u.lifeName : cc().jobs[ji][0] + " — " + u.jobPack, price = sheet.k === "life" ? "$4.99" : "$0.99";
+    h = `<h2 id="shT">${esc(u.payT)}</h2><div class="sp"><b>${esc(item)}</b><b class="price">${price}</b></div><p class="lbl" style="font-weight:400">${esc(u.payB)}</p><button class="btn sun wide" data-act="doPay">${esc(u.payGo)} · ${price}</button><button class="btn alt wide" data-act="close">${esc(u.cancel)}</button>`;
+  }
+  sheetEl.innerHTML = `<div class="sheet-bg" data-act="bg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">${h}</div></div>`;
+  const inp = document.getElementById("lgN"); if (inp) setTimeout(() => inp.focus(), 50);
+}
+function render() {
+  document.documentElement.lang = S.lang || "ru";
+  if (!S.lang) view.innerHTML = pageLang();
+  else if (S.onb === 0) view.innerHTML = pageWelcome();
+  else if (S.onb === 1 || S.page === "job") view.innerHTML = pageJob();
+  else if (S.page === "lesson") view.innerHTML = pageLesson();
+  else if (S.page === "course") view.innerHTML = pageCourse();
+  else if (S.page === "profile") view.innerHTML = pageProfile();
+  else view.innerHTML = pageHome();
+  renderNav(); renderSheet();
+}
+function rerenderTask() { const el = document.getElementById("task"); if (el) el.innerHTML = taskHTML(S.les); else render(); }
+function finishOnb() { S.onb = 2; S.page = "home"; H = []; save(); render(); window.scrollTo(0, 0); }
+
+/* ---------- actions ---------- */
+function act(a, d, e) {
+  const i = S.les;
+  switch (a) {
+    case "lang": if (S.lang) S.tasks[S.lang] = T; S.lang = d.l; T = S.tasks[S.lang] || {}; save(); render(); window.scrollTo(0, 0); break;
+    case "later": S.onb = 1; save(); render(); window.scrollTo(0, 0); break;
+    case "pickJob": S.job = +d.o; save(); render(); break;
+    case "jobDone": if (S.job === null) return; if (S.job >= 0) S.tab = "work"; if (S.onb < 2) finishOnb(); else { save(); back(); } break;
+    case "jobSkip": finishOnb(); break;
+    case "go": if (d.tab) S.tab = d.tab; go(d.p); break;
+    case "tabnav": if (S.page !== d.p) go(d.p); break;
+    case "back": back(); break;
+    case "les": go("lesson", +d.i, { resume: d.resume === "1" }); break;
+    case "prev": if (i > 0) go("lesson", i - 1, { resume: true }); break;
+    case "next": if (i < NL() - 1) go("lesson", i + 1); else { S.tab = "life"; go("course"); } break;
+    case "sel": { const k = cc().L[i].task, s = ts(i), g = +d.g, o = +d.o; s.sel[g] = (k.meter && s.sel[g] === o) ? null : o; changed(i); rerenderTask(); break; }
+    case "fin": ts(i).fin = true; changed(i); rerenderTask(); break;
+    case "style": ts(i).st = +d.o; saveT(); rerenderTask(); break;
+    case "ans": ts(i).ans[+d.q] = d.v; changed(i); rerenderTask(); break;
+    case "tog": { const s = ts(i); s.done[+d.s] = !s.done[+d.s]; changed(i); rerenderTask(); break; }
+    case "ph": { const s = ts(i); s.cur = +d.o; s.seen[+d.o] = true; changed(i); rerenderTask(); break; }
+    case "redo": delete T[i]; saveT(); rerenderTask(); toast(U().redoDone); break;
+    case "copy": copyText(promptOf(i)); break;
+    case "copyBonus": copyText(cc().L[i].task.bp); break;
+    case "copyJob": copyText(cc().jobs[jobIdx()][1]); break;
+    case "tab": S.tab = d.t; save(); render(); break;
+    case "mod": S.open = S.open === +d.o ? -1 : +d.o; save(); render(); break;
+    case "job": S.job = +d.o; save(); render(); break;
+    case "buy": sheet = S.user ? { kind: "pay", k: d.k } : { kind: "login", then: d.k }; renderSheet(); break;
+    case "login": sheet = { kind: "login", then: d.then || "" }; renderSheet(); break;
+    case "logout": S.user = null; save(); render(); break;
+    case "reset": S.stars = {}; S.paid = false; S.jobs = {}; S.tasks = {}; S.pos = {}; S.lastLes = null; T = {}; save(); render(); toast(U().resetDone); break;
+    case "bg": if (e.target === e.currentTarget) { sheet = null; renderSheet(); } break;
+    case "close": sheet = null; renderSheet(); break;
+    case "doLogin": {
+      const inp = document.getElementById("lgN"), nm = inp ? inp.value.trim() : "";
+      if (!nm) { if (inp) inp.focus(); return; }
+      S.user = nm.slice(0, 40);
+      const then = sheet && sheet.then; sheet = (then === "life" || then === "job") ? { kind: "pay", k: then } : null;
+      if (then === "onb") S.onb = 1;
+      save(); render(); if (then === "onb") window.scrollTo(0, 0); toast(U().welcome + S.user); break;
+    }
+    case "doPay": if (sheet.k === "life") S.paid = true; else S.jobs[jobIdx()] = true; save(); sheet = null; render(); toast(U().unlocked); break;
+  }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b || b.disabled) return;
+  if (b.dataset.act === "bg" && e.target !== b) return;
+  e.preventDefault(); act(b.dataset.act, b.dataset, { target: e.target, currentTarget: b });
+});
+view.addEventListener("input", e => {
+  const f = e.target.dataset && e.target.dataset.f; if (!f || S.page !== "lesson") return;
+  const s = ts(S.les); if (f === "cname") s.name = e.target.value; else if (s.d) s.d[f] = e.target.value;
+  saveT(); live();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && sheet) { sheet = null; renderSheet(); }
+  if (e.key === "Enter" && e.target && e.target.id === "lgN") act("doLogin", {}, e);
+});
+let st; window.addEventListener("scroll", () => { if (S.page !== "lesson") return; clearTimeout(st); st = setTimeout(() => { S.pos[S.les] = window.scrollY; save(); }, 300); }, { passive: true });
+render();
+restore(true);
+}
+
+</script>
+</body>
+</html>
