@@ -10,13 +10,28 @@ android {
         applicationId "com.simplyai.app"
         minSdk 26
         targetSdk 34
-        versionCode 3
-        versionName "0.3-demo"
+        versionCode 4
+        versionName "0.3.1-demo"
+    }
+
+    // One fixed key for demo builds, so each new APK installs over the previous one.
+    // Demo only: for Google Play use a separate private upload key that is never committed.
+    signingConfigs {
+        demo {
+            storeFile file('simplyai-demo.keystore')
+            storePassword 'simplyai-demo'
+            keyAlias 'simplyai'
+            keyPassword 'simplyai-demo'
+        }
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.demo
+        }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.demo
         }
     }
 
