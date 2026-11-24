@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +21,18 @@ jobs:
           gradle-version: '8.7'
       - name: Build debug APK
         run: gradle assembleDebug
+      - name: Name the APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk SimplyAI-demo.apk
       - uses: actions/upload-artifact@v4
         with:
           name: SimplyAI-demo-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: SimplyAI-demo.apk
+      - name: Publish to the Releases page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete demo -y --cleanup-tag || true
+          gh release create demo SimplyAI-demo.apk \
+            --title "Simply AI — демо (сборка ${{ github.run_number }})" \
+            --notes "Скачайте SimplyAI-demo.apk на телефон и откройте его. Android попросит разрешить установку из этого источника." \
+            --target "${{ github.sha }}" --latest
