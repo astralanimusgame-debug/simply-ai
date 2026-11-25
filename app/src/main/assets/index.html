@@ -3,131 +3,175 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#2340E8">
+<meta name="theme-color" content="#FFFFFF">
 <title>Simply AI — учимся с Claude</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Golos+Text:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* VOICE: warm and funny, for people who have never touched AI
-   IDEA: a phone lesson book — each page is a tiny real task you do in Claude
-   PICTURE: Grandma mascot, the game scene, live site preview and meters are the pictures
-   COLOUR and TYPE: cobalt, sun yellow, coral on white; Unbounded titles, Golos Text body
-   LAYOUT: one 480px phone column, sticky top bar, bottom navigation, sheets from below */
-:root{color-scheme:light dark;--bg:light-dark(#FFFFFF,#121019);--ink:light-dark(#17142B,#F3F1F8);--mute:light-dark(#5B5670,#B3ADC6);--soft:light-dark(#F1F2FA,#1E1B2B);--line:light-dark(#E6E8F5,#2E2A40);--cream:light-dark(#FFF1D6,#33291A);--card:light-dark(#FFFFFF,#181524);--ok:light-dark(#1F3AC7,#9AABFF);--bad:light-dark(#B4321A,#FF9B85);--cob:#2340E8;--sun:#FFC83D;--coral:#FF6A4D;--hf:'Unbounded',system-ui,sans-serif;--bf:'Golos Text',system-ui,sans-serif}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+/* VOICE: warm, funny, reassuring — for adults who have never used AI (design from Google Stitch)
+   IDEA: a friendly lesson book on the phone; Grandma comments on every screen
+   PICTURE: Grandma avatar, game scene, live site preview, chat-window diagram, quiz cards
+   COLOUR and TYPE: cobalt #2340E8, sun yellow #FFC83D, coral #FF6A4D, ink #17142B on white; Nunito (rounded, has Cyrillic) titles, Plus Jakarta Sans body
+   LAYOUT: one 480px column, 20px margins, 16px gaps, bordered soft cards, bottom navigation */
+:root{color-scheme:light;--bg:#FFFFFF;--ink:#17142B;--var:#4A4766;--out:#777494;--outv:#D5D7E8;--slow:#F7F8FC;--s:#F0F2FA;--shigh:#E6E9F5;
+--cob:#2340E8;--pc:#EEF1FF;--onpc:#0B1E8A;--sun:#FFC83D;--tc:#FFF8E1;--ontc:#4A3500;--coral:#FF6A4D;--sc:#FFF0ED;--onsc:#5C1406;
+--ok:#16803C;--okc:#DCFCE7;--onokc:#14532D;--err:#BA1A1A;--errc:#FFDAD6;--onerrc:#7A0909;
+--hf:'Nunito','Fredoka',system-ui,sans-serif;--bf:'Plus Jakarta Sans','Nunito Sans',system-ui,sans-serif}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--bf);overflow-x:clip;-webkit-tap-highlight-color:transparent}
 .app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:96px}
-.top{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line)}
-.brand{font-family:var(--hf);font-weight:800;font-size:17px;margin-inline-end:auto}.brand b{color:var(--coral)}
-.starc{font-weight:600;background:var(--sun);color:#17142B;border-radius:999px;padding:4px 12px;font-size:14px;white-space:nowrap}
-.pg{padding:18px;display:flex;flex-direction:column;gap:14px}
-h1{font-family:var(--hf);font-weight:800;font-size:26px;line-height:1.1;margin:0;text-wrap:balance}
-h2{font-family:var(--hf);font-weight:600;font-size:19px;line-height:1.2;margin:0;text-wrap:balance}
+.pg{padding:16px 20px 24px;display:flex;flex-direction:column;gap:16px}
+h1{font:800 28px/34px var(--hf);letter-spacing:-.25px;margin:0;text-wrap:balance}
+h2{font:800 22px/28px var(--hf);margin:0;text-wrap:balance}
+h3{font:700 17px/24px var(--bf);margin:0}
 p{margin:0}
-.btn{min-height:52px;border-radius:999px;border:0;background:var(--ink);color:var(--bg);font:600 16px var(--bf);padding:0 22px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;text-align:center}
-.btn.sun{background:var(--sun);color:#17142B}.btn.cob{background:var(--cob);color:#fff}.btn.alt{background:transparent;color:inherit;border:2px solid currentColor}
-.btn.sm{min-height:44px;font-size:15px;padding:0 18px}.btn.wide{width:100%}
+.sub{color:var(--var);font-size:16px;line-height:24px}
+.lbl{font:600 14px/20px var(--bf);color:var(--var)}
+.lblc{font:700 13px/18px var(--bf);color:var(--cob)}
+svg.i{width:20px;height:20px;flex:none}
+.btn{min-height:52px;border-radius:16px;border:0;background:var(--cob);color:#fff;font:700 16px/22px var(--bf);padding:12px 20px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;text-align:center}
+.btn.wide{width:100%}.btn.sm{min-height:48px;font-size:15px;padding:10px 16px}
+.btn.out{background:var(--bg);color:var(--cob);border:2px solid var(--outv)}
+.btn.sun{background:var(--sun);color:var(--ink)}
+.btn.ink{background:var(--ink);color:#fff}
+.btn.white{background:#fff;color:var(--ink)}
+.btn.tonal{background:var(--pc);color:var(--cob)}
+.btn[disabled]{opacity:.45;cursor:default}
+.link{background:none;border:0;color:var(--cob);font:700 15px var(--bf);cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px;padding:0}
+.link.red{color:var(--err);align-self:center}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{min-height:44px;border:2px solid var(--line);border-radius:999px;padding:0 14px;background:var(--card);color:var(--ink);font:600 15px var(--bf);cursor:pointer}
+.chip{min-height:48px;border:1px solid var(--outv);border-radius:999px;padding:0 16px;background:var(--slow);color:var(--ink);font:700 15px var(--bf);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .chip[aria-pressed=true]{background:var(--cob);border-color:var(--cob);color:#fff}
-.lbl{font-size:14px;font-weight:600;color:var(--mute)}
-.task{border:3px solid var(--ink);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px}
-.badge{align-self:flex-start;background:var(--sun);color:#17142B;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
-.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.cnt{font-size:14px;font-weight:600;color:var(--ok);white-space:nowrap}
-.prompt{background:var(--soft);border:2px solid var(--cob);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px}
-.prompt .lbl{color:var(--ok)}.prompt p{font-size:15px;line-height:1.45;overflow-wrap:anywhere;white-space:pre-line}
-.win{background:var(--sun);color:#17142B;border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.4}
-.nina{display:flex;gap:12px;align-items:flex-start;background:var(--cream);border-radius:18px;padding:14px;font-size:15px;line-height:1.4}
-.nina svg{flex:none}
-.tip{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:18px;padding:14px;font-size:15px;line-height:1.4}
-.dot{flex:none;width:28px;height:28px;border-radius:50%;background:var(--cob);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
-.bar{height:10px;border-radius:999px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--cob);border-radius:999px;transition:width .4s}
-.q{background:var(--soft);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px}
-.q b{font-size:16px;line-height:1.4}.two{display:flex;gap:8px}.two .chip{flex:1}
-.fb{font-size:14px;line-height:1.4}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
-label{display:block;font-size:14px;font-weight:600;color:var(--mute);margin-bottom:4px}
-input{width:100%;min-height:48px;border:2px solid var(--line);border-radius:14px;padding:8px 12px;font:16px var(--bf);color:var(--ink);background:var(--card)}
-.illu{border-radius:24px;overflow:hidden;line-height:0}.illu svg{width:100%;height:auto;display:block}
-.les-top{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--mute)}
-.round{flex:none;width:44px;height:44px;border-radius:50%;background:var(--soft);border:0;color:var(--ink);font-size:22px;cursor:pointer;display:grid;place-items:center}
-.hero{background:var(--cob);color:#fff;border-radius:26px;padding:18px;display:flex;flex-direction:column;gap:12px}
-.hero p{color:#E3E8FF}
-.cover{position:relative;border-radius:20px;background:#3552FF;overflow:hidden;line-height:0}
-.cover svg{width:100%;height:auto;display:block}
-.bubs{position:absolute;right:12px;top:14px;width:52%;display:flex;flex-direction:column;gap:8px;line-height:1.3}
-.bub{background:#fff;color:#17142B;border-radius:16px 16px 4px 16px;padding:9px 11px;font-size:14px}
-.bub.y{background:var(--sun);border-radius:16px 16px 16px 4px}
-.li{display:flex;gap:12px;align-items:center;width:100%;text-align:start;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px;min-height:64px;cursor:pointer;color:var(--ink);font:inherit}
-.num{flex:none;width:40px;height:40px;border-radius:12px;background:var(--soft);color:var(--ok);display:grid;place-items:center;font-family:var(--hf);font-weight:800}
-.li.done .num{background:var(--sun);color:#17142B}
-.li .tx{flex:1}.li .tx b{display:block;font-size:16px;line-height:1.3}.li .tx small{color:var(--mute);font-size:13px}
-.coral{background:var(--coral);color:#17142B;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
-.tabs{display:flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden}
-.tabs button{flex:1;min-height:48px;border:0;background:var(--bg);color:var(--ink);font:600 16px var(--bf);cursor:pointer}
-.tabs button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.stats div{background:#3552FF;border-radius:14px;padding:10px}.stats b{display:block;font-family:var(--hf);font-size:18px;white-space:nowrap}.stats span{font-size:13px}
-.mod{border:2px solid var(--line);border-radius:20px;overflow:hidden}.mod.on{border-color:var(--cob)}
-.mod>button{width:100%;display:flex;gap:12px;align-items:center;text-align:start;background:var(--card);border:0;padding:14px;min-height:64px;cursor:pointer;font:inherit;color:var(--ink)}
-.mod ul{margin:0;padding:12px 14px 14px 34px;background:var(--soft);display:flex;flex-direction:column;gap:6px;font-size:15px}
-.mod .st{font-size:13px;color:var(--mute);padding:0 14px 12px;background:var(--soft)}
-.price{font-family:var(--hf);font-weight:800;font-size:20px;white-space:nowrap}
-.cert{border:3px double var(--ink);border-radius:20px;padding:18px;text-align:center;display:flex;flex-direction:column;gap:6px;background:var(--card)}
-.cert .nm{font-family:var(--hf);font-weight:800;font-size:24px;line-height:1.15;overflow-wrap:anywhere}
-.cert.lock{opacity:.6}
-.prof{display:flex;gap:14px;align-items:center}
-.ava{flex:none;width:56px;height:56px;border-radius:50%;background:var(--sun);color:#17142B;display:grid;place-items:center;font-family:var(--hf);font-weight:800;font-size:22px}
-.box{border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
-.sp{display:flex;justify-content:space-between;gap:10px}
-.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--line);z-index:6;padding-bottom:env(safe-area-inset-bottom)}
-.nav div{display:flex;max-width:480px;margin:0 auto}
-.nav button{flex:1;min-height:64px;background:none;border:0;color:var(--mute);font:600 13px var(--bf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
-.nav button[aria-current=page]{color:var(--ok)}
-.sheet-bg{position:fixed;inset:0;background:rgba(10,6,20,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20}
-.sheet{background:var(--bg);color:var(--ink);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
-.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;z-index:30;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
-.toast.on{opacity:1}
-.langs{display:flex;flex-direction:column;gap:10px}
-.site{background:var(--coral);border-radius:22px;padding:16px 18px 0}
-.site .w{background:#fff;color:#17142B;border-radius:16px 16px 0 0;overflow:hidden}
-.site .bz{display:flex;gap:6px;align-items:center;padding:8px 12px;background:#17142B;color:#C9C6D6;font-size:11px}
+.card{background:var(--slow);border:1px solid var(--outv);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.task{background:var(--bg);border:2px solid var(--outv);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.grp{display:flex;flex-direction:column;gap:8px}
+.nina{background:var(--slow);border:1px solid var(--outv);border-radius:24px;padding:14px;display:flex;gap:12px;align-items:center}
+.nina .t{display:flex;flex-direction:column;gap:2px;font-size:16px;line-height:24px}
+.ava{flex:none;width:48px;height:48px;border-radius:50%;border:2px solid var(--sun);background:var(--tc);display:grid;place-items:center;overflow:hidden}
+.ava svg{width:44px;height:44px}
+.msg{background:var(--slow);border:1px solid var(--outv);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg p{font-size:16px;line-height:24px;overflow-wrap:anywhere;white-space:pre-line}
+.bar{height:8px;border-radius:999px;background:var(--s);overflow:hidden}.bar i{display:block;height:100%;background:var(--cob);border-radius:999px;transition:width .4s}
+.cnt{font:700 14px var(--bf);color:var(--cob);white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font:700 14px/20px var(--bf);white-space:nowrap}
+.pill.y{background:var(--tc);border:1px solid var(--sun);color:var(--ink)}
+.pill.b{background:var(--pc);color:var(--cob)}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding:14px 20px}
+.brand{display:flex;align-items:center;gap:10px;font:800 19px var(--hf);margin-inline-end:auto}
+.logo{width:36px;height:36px;border-radius:50%;background:var(--cob);display:grid;place-items:center;flex:none}
+.ltop{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 20px 10px;border-bottom:1px solid var(--outv);display:flex;flex-direction:column;gap:10px}
+.ltop .r{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.round{flex:none;width:44px;height:44px;border-radius:50%;background:var(--s);border:0;color:var(--ink);cursor:pointer;display:grid;place-items:center}
+.pillbtn{flex:none;min-height:40px;border:1px solid var(--outv);background:var(--bg);color:var(--cob);border-radius:999px;padding:0 14px;font:700 14px var(--bf);cursor:pointer}
+.dots{display:flex;gap:6px;align-items:center}.dots i{width:10px;height:10px;border-radius:999px;background:var(--outv)}.dots i.on{width:28px;background:var(--cob)}
+.hero{background:var(--cob);color:#fff;border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.hero h1{color:#fff}
+.hero .bub{display:flex;gap:12px;align-items:flex-start}
+.hero .bb{display:flex;flex-direction:column;gap:8px;flex:1}
+.hero .bb span{background:#fff;color:var(--ink);border-radius:16px 16px 16px 4px;padding:8px 12px;font:700 14px/20px var(--bf);align-self:flex-start}
+.hero .bb span.y{background:var(--sun);border-radius:16px 16px 4px 16px;align-self:flex-end}
+.hero .prog{display:flex;align-items:center;gap:12px;font:700 14px var(--bf)}
+.hero .prog .bar{flex:1;background:#1A2FB0}.hero .prog .bar i{background:var(--sun)}
+.forU{background:var(--coral);color:var(--ink);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.forU .tag{align-self:flex-start;background:#fff;border-radius:999px;padding:4px 12px;font:700 14px var(--bf)}
+.li{display:flex;gap:14px;align-items:center;width:100%;text-align:start;background:var(--bg);border:1px solid var(--outv);border-radius:20px;padding:14px;min-height:72px;cursor:pointer;color:var(--ink);font:inherit}
+.li .num{flex:none;width:44px;height:44px;border-radius:50%;background:var(--s);color:var(--ink);display:grid;place-items:center;font:800 18px var(--hf)}
+.li .tx{flex:1;display:flex;flex-direction:column}.li .tx b{font:700 17px/24px var(--bf)}.li .tx small{font:600 14px var(--bf);color:var(--var)}
+.li .ch{color:var(--out)}
+.li.done{background:var(--tc);border-color:var(--sun)}.li.done .num{background:var(--sun)}
+.li.cur{background:var(--pc);border:2px solid var(--cob)}.li.cur .num{background:var(--cob);color:#fff}.li.cur small{color:var(--cob)}.li.cur .ch{color:var(--cob)}
+.illu{border-radius:24px;overflow:hidden;line-height:0;border:1px solid var(--outv)}.illu svg{width:100%;height:auto;display:block}
+.chatInfo{background:var(--pc);border:1px solid #C9D1FF;border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chatInfo .two{display:flex;align-items:stretch;gap:12px}
+.chatInfo .cw{flex:1;background:#fff;border:1px solid var(--outv);border-radius:16px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.chatInfo .cw b{color:var(--cob);font:700 15px var(--bf)}.chatInfo .cw span{font:600 13px var(--bf);color:var(--var)}
+.chatInfo .wall{width:6px;border-radius:3px;background:var(--coral);flex:none}
+.win{background:var(--sun);color:var(--ink);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.win .h{display:flex;align-items:center;gap:8px;font:800 20px var(--hf)}
+.win .in{background:var(--tc);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.win .in p{font-size:16px;line-height:24px}
+.win ol{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px}
+.kind{align-self:flex-start;border-radius:999px;padding:3px 10px;font:700 13px var(--bf);background:var(--bg);color:var(--ink)}
+.kind.same{background:var(--cob);color:#fff}
+.tip{display:flex;gap:10px;align-items:flex-start;background:var(--pc);border-radius:20px;padding:14px;font-size:16px;line-height:24px}
+.q{border:2px solid var(--outv);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg)}
+.q.ok{border-color:var(--ok)}.q.bad{border-color:var(--err)}
+.q b{font:800 18px/25px var(--hf)}
+.ab{display:flex;gap:8px}
+.ab button{flex:1;min-height:48px;border-radius:14px;border:1px solid var(--outv);background:var(--slow);color:var(--ink);font:700 15px var(--bf);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 8px}
+.ab button.g{background:var(--ok);border-color:var(--ok);color:#fff}.ab button.r{background:var(--err);border-color:var(--err);color:#fff}
+.fb{border-radius:14px;padding:12px;font-size:15px;line-height:22px}.fb.ok{background:var(--okc);color:var(--onokc)}.fb.bad{background:var(--errc);color:var(--onerrc)}
+.meter{background:var(--sc);border:1px solid var(--coral);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.meter .bar{background:#fff}.meter .bar i{background:var(--coral)}
+.chat{background:var(--tc);border:1px solid var(--sun);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.me{align-self:flex-end;max-width:85%;background:var(--cob);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 12px;font-size:15px;line-height:21px}
+.ai{max-width:94%;background:#fff;border:1px solid var(--outv);border-radius:16px 16px 16px 4px;padding:12px;font-size:15px;line-height:22px;white-space:pre-line}
+.chk{display:flex;gap:12px;align-items:center;text-align:start;border:1px solid var(--outv);background:var(--bg);color:var(--ink);border-radius:16px;padding:12px;min-height:56px;font:600 15px/21px var(--bf);cursor:pointer;width:100%}
+.chk[aria-pressed=true]{border:2px solid var(--cob);background:var(--pc)}
+.chk .bx{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--cob);display:grid;place-items:center;color:#fff}
+.chk[aria-pressed=true] .bx{background:var(--cob)}
+.steps{display:flex;flex-direction:column;gap:6px;font-size:15px;color:var(--var)}
+label{display:block;font:600 14px var(--bf);color:var(--var);margin-bottom:6px}
+input{width:100%;min-height:52px;border:1px solid var(--outv);border-radius:14px;padding:10px 14px;font:16px var(--bf);color:var(--ink);background:var(--bg)}
+input:focus{outline:2px solid var(--cob);border-color:var(--cob)}
+.site{background:var(--sc);border:1px solid var(--coral);border-radius:24px;padding:16px 18px 0}
+.site .w{background:#fff;border-radius:16px 16px 0 0;overflow:hidden;border:1px solid var(--outv);border-bottom:0}
+.site .bz{display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--ink);color:#C9C6D6;font-size:11px}
 .site .bz i{width:9px;height:9px;border-radius:50%;background:var(--coral)}.site .bz i+i{background:var(--sun)}.site .bz i+i+i{background:#fff;margin-inline-end:6px}
-.site .hd{padding:16px;color:#fff}.site .hd b{display:block;font-family:var(--hf);font-size:18px;line-height:1.15;overflow-wrap:anywhere}.site .hd span{font-size:13px;opacity:.9}
+.site .hd{padding:16px;color:#fff}.site .hd b{display:block;font:800 19px/1.2 var(--hf);overflow-wrap:anywhere}.site .hd span{font-size:13px;opacity:.9}
 .site .bd{padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px}
-.pill{display:inline-block;border:2px solid #17142B;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600}
-.call{align-self:flex-start;background:#17142B;color:#fff;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;overflow-wrap:anywhere}
-.chat{background:var(--sun);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:8px;color:#17142B}
-.me{align-self:flex-end;max-width:85%;background:var(--cob);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 12px;font-size:15px;line-height:1.35}
-.ai{max-width:94%;background:#fff;border-radius:16px 16px 16px 4px;padding:12px;font-size:15px;line-height:1.45;white-space:pre-line}
-.meter{background:var(--coral);color:#17142B;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px}
-.meter .bar{background:#fff}.meter .bar i{background:#17142B}
+.site .pl{display:inline-block;border:1px solid var(--ink);border-radius:999px;padding:3px 10px;font:700 12px var(--bf)}
+.site .call{align-self:flex-start;background:var(--ink);color:#fff;border-radius:12px;padding:8px 14px;font:700 13px var(--bf);overflow-wrap:anywhere}
 .tiles{background:var(--cob);color:#fff;border-radius:24px;padding:16px}
 .tiles .g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
-.tiles .g div{background:#3552FF;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;line-height:1.25}
-.chk{display:flex;gap:12px;align-items:flex-start;text-align:start;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:12px;min-height:56px;font:15px/1.4 var(--bf);cursor:pointer;width:100%}
-.chk[aria-pressed=true]{border-color:var(--cob);background:var(--soft)}
-.chk .bx{flex:none;width:28px;height:28px;border-radius:8px;border:2px solid var(--cob);display:grid;place-items:center;font-weight:800;color:#fff}
-.chk[aria-pressed=true] .bx{background:var(--cob)}
-.steps{display:flex;flex-direction:column;gap:6px;font-size:15px}
-.link{background:none;border:0;color:var(--ok);font:600 15px var(--bf);cursor:pointer;min-height:44px;align-self:flex-start;padding:0}
-.pillbtn{flex:none;min-height:40px;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:0 12px;font:600 14px var(--bf);cursor:pointer}
-.bonus{margin-top:10px;background:#fff;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
-.bonus .lbl{color:#5B5670}.bonus p{font-size:15px;color:#17142B;overflow-wrap:anywhere}
-.bonus .btn:not(.alt){background:#17142B;color:#fff}.bonus .btn.alt{color:#17142B}
-.why{display:flex;gap:10px;align-items:center;font-size:16px}
-.how{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px;font-size:16px}
-.steps-top{display:flex;gap:6px}.dotstep{width:28px;height:6px;border-radius:3px;background:var(--line)}.dotstep.on{background:var(--cob)}
-.got{color:#E0A800}
-.g{flex:none;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--cob);display:grid;place-items:center;font-weight:800;font-size:14px}
-.btn[disabled]{opacity:.45;cursor:default}
-.two .btn.alt{flex:none}
-.kind{align-self:flex-start;background:#E6E8F5;color:#17142B;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600}
-.kind.same{background:#2340E8;color:#fff}
-.how.sm{font-size:15px;color:#17142B}
-.lost{border-top:2px dashed #E6E8F5;padding-top:10px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:#5B5670}
+.tiles .g div{background:#3552FF;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;font:700 13px/1.25 var(--bf)}
+.navb{display:flex;gap:10px}.navb .btn{flex:1}.navb .btn.out{flex:none}
+.got{color:#D9A400}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stats div{background:var(--slow);border:1px solid var(--outv);border-radius:16px;padding:12px 6px;text-align:center}
+.stats b{display:block;font:800 19px var(--hf);color:var(--cob);white-space:nowrap}.stats span{font:600 13px var(--bf);color:var(--var)}
+.seg{display:flex;background:var(--s);border:1px solid var(--outv);border-radius:999px;padding:4px}
+.seg button{flex:1;min-height:48px;border:0;border-radius:999px;background:transparent;color:var(--var);font:700 16px var(--bf);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--cob);color:#fff}
+.mod{border:1px solid var(--outv);border-radius:20px;overflow:hidden;background:var(--bg)}
+.mod.on{border:2px solid var(--cob)}
+.mod>button{width:100%;display:flex;gap:12px;align-items:center;text-align:start;background:transparent;border:0;padding:14px;min-height:72px;cursor:pointer;font:inherit;color:var(--ink)}
+.mod .ic{flex:none;width:40px;height:40px;border-radius:50%;background:var(--s);color:var(--var);display:grid;place-items:center}
+.mod .tx{flex:1;display:flex;flex-direction:column}.mod .tx b{font:700 17px/24px var(--bf)}.mod .tx small{font:600 14px var(--bf);color:var(--var)}
+.mod ul{margin:0;padding:12px 16px 14px 36px;background:var(--slow);border-top:1px solid var(--outv);display:flex;flex-direction:column;gap:6px;font-size:15px}
+.mod .st{font:600 14px var(--bf);color:var(--var);padding:0 16px 14px;background:var(--slow)}
+.intro{background:var(--pc);border:2px solid var(--cob);border-radius:20px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;width:100%;text-align:start;font:inherit;color:var(--ink)}
+.intro .tx{flex:1;display:flex;flex-direction:column;gap:2px}.intro .tx b{font:700 17px/24px var(--bf)}.intro .tx small{font:600 14px var(--bf);color:var(--var)}
+.intro .tag{font:700 12px var(--bf);color:var(--cob);text-transform:uppercase;letter-spacing:.3px}
+.cert{background:var(--sun);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.cert .nm{font:800 24px/1.15 var(--hf);overflow-wrap:anywhere}
+.cert.lock{background:var(--tc);border:1px dashed var(--sun)}
+.price{font:800 22px var(--hf);white-space:nowrap}
+.ucard{display:flex;gap:14px;align-items:center}
+.uava{flex:none;width:64px;height:64px;border-radius:50%;border:2px solid var(--cob);background:var(--pc);color:var(--cob);display:grid;place-items:center;font:800 26px var(--hf)}
+.ptiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ptiles div{border:1px solid var(--outv);border-radius:16px;padding:12px 6px;text-align:center;background:var(--bg)}
+.ptiles div:first-child{background:var(--tc);border-color:var(--sun)}
+.ptiles b{display:block;font:800 22px var(--hf);color:var(--cob)}.ptiles div:first-child b{color:var(--ink)}
+.ptiles span{font:600 13px var(--bf);color:var(--var)}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--outv);z-index:6;padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+.nav div{display:flex;max-width:480px;margin:0 auto;gap:6px}
+.nav button{flex:1;min-height:56px;background:none;border:0;border-radius:16px;color:var(--var);font:700 13px var(--bf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.nav button[aria-current=page]{background:var(--pc);color:var(--cob)}
+.sheet-bg{position:fixed;inset:0;background:rgba(23,20,43,.4);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--bg);color:var(--ink);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:12px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px;max-height:92vh;overflow:auto}
+.handle{width:40px;height:6px;border-radius:999px;background:var(--outv);margin:0 auto}
+.checks{list-style:none;margin:0;padding:14px;background:var(--slow);border:1px solid var(--outv);border-radius:20px;display:flex;flex-direction:column;gap:8px}
+.checks li{display:flex;gap:10px;align-items:center;color:var(--ink)}.checks svg{color:var(--ok)}
+.pricebox{flex:none;background:var(--sun);border-radius:16px;padding:8px 14px}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;z-index:30;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.why{display:flex;gap:12px;align-items:center;background:var(--slow);border:1px solid var(--outv);border-radius:20px;padding:14px;font-size:16px}
+.okdot{flex:none;width:36px;height:36px;border-radius:50%;background:var(--okc);color:var(--ok);display:grid;place-items:center}
+.g{flex:none;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--cob);display:grid;place-items:center;font:800 15px var(--bf)}
+.langb{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:56px;border:2px solid var(--outv);border-radius:16px;background:var(--bg);color:var(--cob);font:700 17px var(--bf);padding:0 18px;cursor:pointer}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -597,6 +641,44 @@ es: { signedReal: "Has entrado con Google", loginErr: "No se pudo entrar. Revisa
 };
 for (const l of Object.keys(C)) Object.assign(C[l].ui, EXTRA4[l]);
 
+/* v5: Stitch design — Grandma lines on every screen and new labels */
+const EXTRA5 = {
+ru: { langNina: "«Я говорю на трёх языках, и два из них — „чай“ и „пирожки“. Выбирайте свой!»",
+  signNina: "«Никаких новых паролей! Нажмите на своё имя в Google — и готово. Проще, чем испечь пирожок».",
+  jobNina: "«На пенсии? Отлично — теперь есть время покомандовать роботом!»",
+  homeNina0: "«Начнём с игры. Я в первый раз набрала 3 очка — и то случайно».", homeNinaN: "«Уже {n} ★! Так вы скоро меня учить будете».", homeNinaAll: "«Все звёзды собраны! Теперь вы учите меня».",
+  courseNina: "«Дешевле чашки кофе — и на клавиатуру не прольётся».", profNina: "«Смотрите-ка: {n} ★ — и ни одного нового седого волоса!»",
+  payNina: "«Никакой ежемесячной платы! Не люблю её почти так же, как звонки из „банка“».",
+  stepOf: (a, b) => `Шаг ${a} из ${b}`, ofN: (a, b) => `${a} из ${b}`, qOf: (a, b) => `Вопрос ${a} из ${b}`,
+  listT: "Бесплатное интро · 7 мини-уроков", mapT: "Карта курса", introCard: "Интро: первые шаги с Claude",
+  free: "Бесплатно", inProg: "в процессе", completed: "пройдено", modMeta: n => `${n} задания · 15 мин`, introMeta: "7 мини-заданий · 25 мин",
+  sample: "Пример задания", oneTime: "Разовая покупка", payLife: ["Без подписки — платите один раз", "Сертификат «Я дружу с ИИ» в подарок"], payJob: ["Без подписки — платите один раз", "3 задания из вашей профессии"],
+  starsT: "Звёзды", lessonsT: "Уроки", buysT: "Покупки", progT: "Ваши успехи", howBack: "Как вернуться в тот же чат:", yourJob: "Ваша профессия", buildT: "Соберите сообщение" },
+en: { langNina: "“I only speak three languages, and two of them are ‘tea’ and ‘cookies’. Pick yours!”",
+  signNina: "“No new passwords to forget! Just tap your Google name — easy as pie.”",
+  jobNina: "“Retired? Even better — now you’ve got time to boss a robot around!”",
+  homeNina0: "“Let’s start with the game. My first try I scored 3 — by accident.”", homeNinaN: "“{n} stars already! At this rate you’ll be teaching me by Friday.”", homeNinaAll: "“All stars collected! Now you teach me.”",
+  courseNina: "“Less than a cup of coffee — and it never spills on your keyboard.”", profNina: "“Look at you — {n} stars and not a single grey hair added!”",
+  payNina: "“No sneaky monthly fees! I hate those almost as much as spam calls.”",
+  stepOf: (a, b) => `Step ${a} of ${b}`, ofN: (a, b) => `${a} of ${b}`, qOf: (a, b) => `Question ${a} of ${b}`,
+  listT: "Free intro · 7 mini lessons", mapT: "Course map", introCard: "Intro: first steps with Claude",
+  free: "Free", inProg: "in progress", completed: "completed", modMeta: n => `${n} tasks · 15 min`, introMeta: "7 mini tasks · 25 min",
+  sample: "Sample task", oneTime: "One-time unlock", payLife: ["No subscription — pay once, keep forever", "Includes your “AI Friend” certificate"], payJob: ["No subscription — pay once, keep forever", "3 tasks from your real work"],
+  starsT: "Stars", lessonsT: "Lessons", buysT: "Purchases", progT: "Your progress", howBack: "How to return to the same chat:", yourJob: "Your profession", buildT: "Build your message" },
+es: { langNina: "«Hablo tres idiomas, y dos de ellos son “té” y “galletas”. ¡Elige el tuyo!»",
+  signNina: "«¡Nada de contraseñas nuevas! Toca tu nombre de Google y listo. Más fácil que hacer galletas».",
+  jobNina: "«¿Jubilado? ¡Mejor aún: ahora tienes tiempo para mandar a un robot!»",
+  homeNina0: "«Empecemos con el juego. La primera vez hice 3 puntos, y fue sin querer».", homeNinaN: "«¡Ya llevas {n} estrellas! A este paso el viernes me enseñas tú».", homeNinaAll: "«¡Todas las estrellas! Ahora enséñame tú».",
+  courseNina: "«Cuesta menos que un café, y nunca se derrama sobre el teclado».", profNina: "«¡Mírate: {n} estrellas y ni una cana nueva!»",
+  payNina: "«¡Sin cuotas mensuales escondidas! Las odio casi tanto como las llamadas de spam».",
+  stepOf: (a, b) => `Paso ${a} de ${b}`, ofN: (a, b) => `${a} de ${b}`, qOf: (a, b) => `Pregunta ${a} de ${b}`,
+  listT: "Intro gratis · 7 minilecciones", mapT: "Mapa del curso", introCard: "Intro: primeros pasos con Claude",
+  free: "Gratis", inProg: "en curso", completed: "completado", modMeta: n => `${n} tareas · 15 min`, introMeta: "7 minitareas · 25 min",
+  sample: "Tarea de ejemplo", oneTime: "Compra única", payLife: ["Sin suscripción: pagas una vez y es tuyo", "Incluye tu certificado «Amigo de la IA»"], payJob: ["Sin suscripción: pagas una vez y es tuyo", "3 tareas de tu trabajo real"],
+  starsT: "Estrellas", lessonsT: "Lecciones", buysT: "Compras", progT: "Tu progreso", howBack: "Cómo volver al mismo chat:", yourJob: "Tu profesión", buildT: "Arma tu mensaje" }
+};
+for (const l of Object.keys(C)) Object.assign(C[l].ui, EXTRA5[l]);
+
 {
 const LANGS = [["ru", "Русский"], ["en", "English"], ["es", "Español"]];
 const KEY = "simplyai.v2";
@@ -708,28 +790,44 @@ function copyText(txt) {
   try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(ok, legacy); return; } } catch (e) {}
   legacy();
 }
-const chip = (label, on, attrs) => `<button class="chip" aria-pressed="${on}" ${attrs}>${esc(label)}</button>`;
-const openBtn = () => `<a class="btn alt sm" href="https://claude.ai/new" target="_blank" rel="noopener">${esc(U().open)}</a>`;
-const promptBox = (txt, act) => `<div class="prompt"><span class="lbl">${esc(U().yourMsg)}</span><p id="pr">${esc(txt)}</p><div class="chips"><button class="btn cob sm" data-act="${act}">${esc(U().copy)}</button>${openBtn()}</div></div>`;
+/* ---------- design pieces (from the Stitch design) ---------- */
+const IC = {
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', checkC: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',
+  back: '<path d="M19 12H5M11 6l-6 6 6 6"/>', fwd: '<path d="M5 12h14M13 6l6 6-6 6"/>', chev: '<path d="M9 6l6 6-6 6"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  play: '<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"/>', copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  open: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', logout: '<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/>',
+  reset: '<path d="M4 12a8 8 0 1 0 2.3-5.6M4 4v5h5"/>', chat: '<path d="M4 5h16v11H9l-5 4z"/>', bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/>',
+  cert: '<circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 21l5-3 5 3-1.5-7.5"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z" fill="currentColor" stroke="none"/>',
+  home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>', course: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>', profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>'
+};
+const ic = (n, s) => `<svg class="i" viewBox="0 0 24 24" ${s ? `style="width:${s}px;height:${s}px"` : ""} fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+const LOGO = '<span class="logo" aria-hidden="true"><svg viewBox="0 0 108 108" width="30" height="30"><path fill="#fff" d="M34,36h40a8,8 0,0 1,8 8v20a8,8 0,0 1,-8 8H50l-12,10v-10h-4a8,8 0,0 1,-8 -8V44a8,8 0,0 1,8 -8z"/><path fill="#FFC83D" d="M54,42l3.5,8.5 8.5,3.5 -8.5,3.5 -3.5,8.5 -3.5,-8.5 -8.5,-3.5 8.5,-3.5z"/></svg></span>';
+const ava = () => `<span class="ava">${NINA}</span>`;
+const nina = txt => `<aside class="nina">${ava()}<div class="t"><span class="lblc">${esc(U().nina)}</span><span>${esc(txt)}</span></div></aside>`;
+const chip = (label, on, attrs) => `<button class="chip" aria-pressed="${on}" ${attrs}>${on ? ic("check", 18) : ""}${esc(label)}</button>`;
+const openBtn = (cls) => `<a class="btn ${cls || "out"} wide" href="https://claude.ai/new" target="_blank" rel="noopener">${ic("open")}${esc(U().open)}</a>`;
+const promptBox = (txt, act) => `<div class="msg"><span class="lblc">${esc(U().yourMsg)}</span><p id="pr">${esc(txt)}</p><button class="btn wide" data-act="${act}">${ic("copy")}${esc(U().copy)}</button>${openBtn()}</div>`;
 function win(k, i) {
   const u = U();
   let b = "";
   if (k.bp && k.bk === "same") {
-    b = `<div class="bonus"><span class="kind same">${esc(u.sameT)}</span><p>${esc(k.bp)}</p><ol class="how sm">${u.sameSteps.map(x => `<li>${esc(x.replace("{w}", k.bw))}</li>`).join("")}</ol><div class="chips"><button class="btn sm" data-act="copyBonus">${esc(u.copy)}</button></div><div class="lost"><span>${esc(u.lost)}</span><div class="chips"><button class="btn alt sm" data-act="copyAll">${esc(u.copyAll)}</button>${openBtn()}</div></div></div>`;
+    b = `<div class="in"><span class="kind same">${esc(u.sameT)}</span><p><b>${esc(k.bp)}</b></p><b style="font-size:15px">${esc(u.howBack)}</b><ol>${u.sameSteps.map(x => `<li>${esc(x.replace("{w}", k.bw))}</li>`).join("")}</ol><button class="btn wide" data-act="copyBonus">${ic("copy")}${esc(u.copy)}</button></div>
+    <p style="font-size:15px">${esc(u.lost)}</p><button class="btn ink wide" data-act="copyAll">${ic("copy")}${esc(u.copyAll)}</button>`;
   } else if (k.bp) {
-    b = `<div class="bonus"><span class="kind">${esc(u.newT)}</span><p>${esc(k.bp)}</p><div class="chips"><button class="btn sm" data-act="copyBonus">${esc(u.copy)}</button>${openBtn()}</div></div>`;
+    b = `<div class="in"><span class="kind">${esc(u.newT)}</span><p><b>${esc(k.bp)}</b></p><button class="btn wide" data-act="copyBonus">${ic("copy")}${esc(u.copy)}</button>${openBtn("white")}</div>`;
   }
-  return `<div class="win"><b>★ ${esc(u.starGot)}</b> ${esc(k.bonus)}${b}</div>`;
+  return `<section class="win"><div class="h">${ic("star", 24)}${esc(u.starGot)}</div><p>${esc(k.bonus)}</p>${b}</section>`;
 }
-const chatSvg2 = () => `<svg viewBox="0 0 346 150" aria-hidden="true"><rect width="346" height="150" fill="#2340E8"/><circle cx="320" cy="20" r="50" fill="#3552FF"/>${[0, 1].map(c => { const x = c ? 196 : 16; return `<rect x="${x}" y="16" width="134" height="118" rx="14" fill="#fff"/><text x="${x + 12}" y="38" fill="#17142B" font-family="Golos Text, sans-serif" font-size="12" font-weight="600">${esc(c ? U().chatZ : U().chatA)}</text><rect x="${x + 50}" y="50" width="72" height="16" rx="8" fill="#2340E8"/><rect x="${x + 12}" y="74" width="86" height="22" rx="8" fill="#F1F2FA"/><rect x="${x + 64}" y="104" width="58" height="16" rx="8" fill="#2340E8"/>`; }).join("")}<path d="M173 22v106" stroke="#FFC83D" stroke-width="4" stroke-dasharray="8 7" stroke-linecap="round"/><circle cx="173" cy="75" r="16" fill="#FF6A4D"/><path d="M166 68l14 14M180 68l-14 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>`;
 function nextIdx() { for (let i = 0; i < NL(); i++) if (!S.stars[i]) return i; return -1; }
 /* the lesson "Continue" opens: the one you left unfinished, else the first unfinished */
 function resumeIdx() { if (S.lastLes !== null && S.lastLes !== undefined && S.lastLes < NL() && !S.stars[S.lastLes]) return S.lastLes; return nextIdx(); }
 function ctaBtn(cls) {
   const u = U(), r = resumeIdx(), n = starsN();
-  if (r < 0) return `<button class="btn ${cls}" data-act="les" data-i="0">${esc(u.again)}</button>`;
+  if (r < 0) return `<button class="btn ${cls} wide" data-act="les" data-i="0">${ic("reset")}${esc(u.again)}</button>`;
   const resume = r === S.lastLes ? "1" : "";
-  return `<button class="btn ${cls}" data-act="les" data-i="${r}" data-resume="${resume}">${esc(n || resume ? u.cont + (r + 1) : u.start)}</button>`;
+  return `<button class="btn ${cls} wide" data-act="les" data-i="${r}" data-resume="${resume}">${ic("play")}${esc(n || resume ? u.cont + (r + 1) : u.start)}</button>`;
 }
 
 /* ---------- tasks ---------- */
@@ -737,43 +835,50 @@ function taskHTML(i) {
   const k = cc().L[i].task, s = ts(i), u = U(), done = isDone(i);
   let cnt = "";
   if (k.type === "quiz") { const r = k.qs.filter((q, qi) => s.ans[qi] === q[1]).length; cnt = u.right(r, k.qs.length); }
-  if (k.type === "check") cnt = s.done.filter(Boolean).length + " / " + k.steps.length;
+  if (k.type === "check") cnt = u.ofN(s.done.filter(Boolean).length, k.steps.length);
   if (k.type === "phrases") cnt = u.tried(Object.keys(s.seen).length, k.ps.length);
-  let h = `<section class="task"><div class="row"><span class="badge">${esc(u.mini)} · ${k.min} ${esc(u.min)}</span>${cnt ? `<span class="cnt">${esc(cnt)}</span>` : ""}</div><h2>${esc(k.title)}</h2>`;
+  const head = `<div class="row"><span class="pill b">${esc(u.mini)} · ${k.min} ${esc(u.min)}</span>${cnt ? `<span class="pill y">${ic("star", 16)}${esc(cnt)}</span>` : ""}</div><h2>${esc(k.title)}</h2>`;
+  let h = "";
+  if (k.type === "quiz") {
+    h = `<div class="grp">${head}</div>`;
+    k.qs.forEach((q, qi) => {
+      const v = s.ans[qi], ok = v === q[1];
+      const bt = (code, label) => { const on = v === code; const cls = on ? (ok ? "g" : "r") : ""; return `<button class="${cls}" aria-pressed="${on}" data-act="ans" data-q="${qi}" data-v="${code}">${on ? ic(ok ? "check" : "x", 18) : ""}${esc(label)}</button>`; };
+      h += `<div class="q ${v ? (ok ? "ok" : "bad") : ""}"><span class="lbl">${esc(u.qOf(qi + 1, k.qs.length))}</span><b>${esc(q[0])}</b><div class="ab">${bt("a", k.a)}${bt("b", k.b)}</div>${v ? `<div class="fb ${ok ? "ok" : "bad"}">${esc(ok ? q[2] : q[3])}</div>` : ""}</div>`;
+    });
+    if (done) h += win(k, i) + `<button class="link" data-act="redo">${ic("reset")}${esc(u.redo)}</button>`;
+    return h;
+  }
+  h = `<section class="task">${head}`;
   if (k.type === "builder") {
-    if (k.meter) { const n = s.sel.filter(x => x !== null).length; h += `<div class="meter"><div class="sp"><b>${esc(u.accuracy)}</b><b class="price">${n}/5</b></div><div class="bar"><i style="width:${n * 20}%"></i></div><span>${esc(k.meterV[n])}</span></div>`; }
-    k.groups.forEach((g, gi) => { h += `<div class="lbl">${esc(g.t)}</div><div class="chips">${g.o.map((o, oi) => chip(o[0], s.sel[gi] === oi, `data-act="sel" data-g="${gi}" data-o="${oi}"`)).join("")}</div>`; });
+    if (k.meter) { const n = s.sel.filter(x => x !== null).length; h += `<div class="meter"><div class="row"><b>${esc(u.accuracy)}</b><b class="price">${n}/5</b></div><div class="bar"><i style="width:${n * 20}%"></i></div><span>${esc(k.meterV[n])}</span></div>`; }
+    k.groups.forEach((g, gi) => { h += `<div class="grp"><span class="lbl">${esc(g.t)}</span><div class="chips">${g.o.map((o, oi) => chip(o[0], s.sel[gi] === oi, `data-act="sel" data-g="${gi}" data-o="${oi}"`)).join("")}</div></div>`; });
     h += promptBox(promptOf(i), "copy");
     if (k.steps) h += `<div class="steps">${k.steps.map((t, n) => `<span><b>${n + 1}.</b> ${esc(t)}</span>`).join("")}</div>`;
-    if (!k.meter && !done) h += `<button class="btn sun wide" data-act="fin">${esc(k.fin)}</button>`;
+    if (!k.meter && !done) h += `<button class="btn sun wide" data-act="fin">${ic("star")}${esc(k.fin)}</button>`;
   }
   if (k.type === "site") {
     const st = k.styles[s.st], sv = (s.d.serv || "").split(",").map(x => x.trim()).filter(Boolean).slice(0, 5);
-    h += `<div class="site" aria-hidden="true"><div class="w"><div class="bz"><i></i><i></i><i></i>${esc(u.preview)}</div><div class="hd" style="background:${st[2]}"><b id="pvN">${esc(s.d.name)}</b><span id="pvS">${esc([s.d.job, s.d.city].filter(Boolean).join(" · "))}</span></div><div class="bd"><div class="chips" id="pvV">${sv.map(x => `<span class="pill">${esc(x)}</span>`).join("")}</div><span class="call" id="pvC">${esc(u.contact)}: ${esc(s.d.contact)}</span></div></div></div>`;
+    h += `<div class="site" aria-hidden="true"><div class="w"><div class="bz"><i></i><i></i><i></i>${esc(u.preview)}</div><div class="hd" style="background:${st[2]}"><b id="pvN">${esc(s.d.name)}</b><span id="pvS">${esc([s.d.job, s.d.city].filter(Boolean).join(" · "))}</span></div><div class="bd"><div class="chips" id="pvV">${sv.map(x => `<span class="pl">${esc(x)}</span>`).join("")}</div><span class="call" id="pvC">${esc(u.contact)}: ${esc(s.d.contact)}</span></div></div></div>`;
     k.fields.forEach(f => { h += `<div><label for="f_${f[0]}">${esc(f[1])}</label><input id="f_${f[0]}" data-f="${f[0]}" value="${esc(s.d[f[0]])}" autocomplete="off"></div>`; });
-    h += `<div class="lbl">${esc(u.styleLbl)}</div><div class="chips">${k.styles.map((x, xi) => chip(x[0], s.st === xi, `data-act="style" data-o="${xi}"`)).join("")}</div>`;
+    h += `<div class="grp"><span class="lbl">${esc(u.styleLbl)}</span><div class="chips">${k.styles.map((x, xi) => chip(x[0], s.st === xi, `data-act="style" data-o="${xi}"`)).join("")}</div></div>`;
     h += promptBox(promptOf(i), "copy");
-    if (!done) h += `<button class="btn sun wide" data-act="fin">${esc(k.fin)}</button>`;
-  }
-  if (k.type === "quiz") {
-    k.qs.forEach((q, qi) => {
-      const v = s.ans[qi], ok = v === q[1];
-      h += `<div class="q"><b>${esc(q[0])}</b><div class="two">${chip(k.a, v === "a", `data-act="ans" data-q="${qi}" data-v="a"`)}${chip(k.b, v === "b", `data-act="ans" data-q="${qi}" data-v="b"`)}</div>${v ? `<div class="fb ${ok ? "ok" : "bad"}">${esc(ok ? q[2] : q[3])}</div>` : ""}</div>`;
-    });
+    if (!done) h += `<button class="btn sun wide" data-act="fin">${ic("star")}${esc(k.fin)}</button>`;
   }
   if (k.type === "check") {
     const n = s.done.filter(Boolean).length;
     h += `<div class="bar"><i style="width:${n / k.steps.length * 100}%"></i></div>`;
-    k.steps.forEach((t, si) => { h += `<button class="chk" aria-pressed="${s.done[si]}" data-act="tog" data-s="${si}"><span class="bx">${s.done[si] ? "✓" : ""}</span><span>${esc(t)}</span></button>`; });
+    k.steps.forEach((t, si) => { h += `<button class="chk" aria-pressed="${s.done[si]}" data-act="tog" data-s="${si}"><span class="bx">${s.done[si] ? ic("check", 18) : ""}</span><span>${esc(t)}</span></button>`; });
     h += `<div><label for="f_cname">${esc(k.nameLbl)}</label><input id="f_cname" data-f="cname" value="${esc(s.name)}" placeholder="${esc(k.defName)}" autocomplete="given-name"></div>`;
     h += promptBox(promptOf(i), "copy");
   }
   if (k.type === "phrases") {
     h += `<div class="chat"><div class="me">${esc(s.cur < 0 ? k.ask : k.ps[s.cur][0])}</div><div class="ai">${esc(s.cur < 0 ? k.base : k.ps[s.cur][1])}</div></div>`;
-    h += `<div class="lbl">${esc(u.phrasesLbl)}</div><div class="chips">${k.ps.map((p, pi) => chip(p[0], s.cur === pi, `data-act="ph" data-o="${pi}"`)).join("")}</div>`;
+    h += `<div class="grp"><span class="lbl">${esc(u.phrasesLbl)}</span><div class="chips">${k.ps.map((p, pi) => chip(p[0], s.cur === pi, `data-act="ph" data-o="${pi}"`)).join("")}</div></div>`;
   }
-  if (done) h += win(k, i) + `<button class="link" data-act="redo">↺ ${esc(u.redo)}</button>`;
-  return h + "</section>";
+  h += "</section>";
+  if (done) h += win(k, i) + `<button class="link" data-act="redo">${ic("reset")}${esc(u.redo)}</button>`;
+  return h;
 }
 function live() {
   const i = S.les, k = cc().L[i].task, s = ts(i), pr = document.getElementById("pr");
@@ -782,45 +887,53 @@ function live() {
     const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
     set("pvN", s.d.name); set("pvS", [s.d.job, s.d.city].filter(Boolean).join(" · ")); set("pvC", U().contact + ": " + s.d.contact);
     const pv = document.getElementById("pvV");
-    if (pv) pv.innerHTML = (s.d.serv || "").split(",").map(x => x.trim()).filter(Boolean).slice(0, 5).map(x => `<span class="pill">${esc(x)}</span>`).join("");
+    if (pv) pv.innerHTML = (s.d.serv || "").split(",").map(x => x.trim()).filter(Boolean).slice(0, 5).map(x => `<span class="pl">${esc(x)}</span>`).join("");
   }
 }
 
 /* ---------- pages ---------- */
-function topBar() { return `<header class="top"><span class="brand">Simply <b>AI</b></span><span class="starc">★ ${starsN()} / ${NL()}</span></header>`; }
+function topBar() { return `<header class="top"><span class="brand">${LOGO}Simply AI</span><span class="pill y">${ic("star", 16)}${starsN()} / ${NL()}</span></header>`; }
 function pageLang() {
-  return `<div class="pg" style="min-height:100vh;justify-content:center"><div class="hero"><div class="cover">${coverSvg()}</div><h1>Simply AI</h1><p>Выберите язык · Choose your language · Elige tu idioma</p></div><div class="langs">${LANGS.map(l => `<button class="btn alt wide" data-act="lang" data-l="${l[0]}">${esc(l[1])}</button>`).join("")}</div></div>`;
+  const g = (navigator.language || "en").slice(0, 2), l = C[g] ? g : "en";
+  return `<div class="pg" style="min-height:100vh"><span class="pill b" style="align-self:center;margin-top:12px">${LOGO.replace('class="logo"', 'class="logo" style="width:24px;height:24px"')}Simply AI</span>
+  <div class="illu" style="background:var(--tc);border-color:var(--sun);align-self:center;width:200px"><svg viewBox="16 118 180 212" aria-hidden="true">${coverSvg().replace(/^<svg[^>]*>|<\/svg>$/g, "")}</svg></div>
+  <div style="text-align:center"><h1>Simply AI</h1><p class="sub">Выберите язык · Choose your language · Elige tu idioma</p></div>
+  <div class="grp" style="gap:12px">${LANGS.map(x => `<button class="langb" data-act="lang" data-l="${x[0]}">${esc(x[1])}${ic("fwd")}</button>`).join("")}</div>
+  ${nina(C[l].ui.langNina).replace(esc(U().nina), esc(C[l].ui.nina))}</div>`;
 }
 function pageWelcome() {
   const u = U();
   if (S.user) return pageJob();
-  return `<div class="pg"><div class="steps-top"><span class="dotstep on"></span><span class="dotstep"></span></div>
-  <h1>${esc(u.welT)}</h1><p>${esc(u.welS)}</p>
-  <div class="box">${u.why.map(w => `<div class="why"><span class="dot">✓</span><span>${esc(w)}</span></div>`).join("")}</div>
-  <h2>${esc(u.howT)}</h2><div class="illu">${accSvg()}</div>
-  <ol class="how">${u.how.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
-  <button class="btn cob wide" data-act="login" data-then="onb"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>
-  <button class="btn alt wide" data-act="later">${esc(u.later)}</button></div>`;
+  return `<div class="pg"><div class="row"><span class="dots"><i class="on"></i><i></i></span><span class="lbl">${esc(u.stepOf(1, 2))}</span></div>
+  <div class="illu" style="background:var(--pc)">${accSvg()}</div>
+  <h1>${esc(u.welT)}</h1><p class="sub">${esc(u.welS)}</p>
+  ${u.why.map(w => `<div class="why"><span class="okdot">${ic("check", 18)}</span><span>${esc(w)}</span></div>`).join("")}
+  <button class="btn wide" data-act="login" data-then="onb"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>
+  <button class="btn out wide" data-act="later">${esc(u.later)}</button>
+  ${nina(u.signNina)}</div>`;
 }
 function pageJob() {
   const u = U(), onb = S.onb < 2;
-  return `<div class="pg">${onb ? `<div class="steps-top"><span class="dotstep"></span><span class="dotstep on"></span></div>` : `<div class="les-top"><button class="round" data-act="back" aria-label="${esc(u.back)}">‹</button></div>`}
-  <h1>${esc(u.jobT)}</h1><p>${esc(u.jobS)}</p>
-  <div class="chips">${cc().jobs.map((j, ji) => chip(j[0], S.job === ji, `data-act="pickJob" data-o="${ji}"`)).join("")}${chip(u.jobNone, S.job === -1, `data-act="pickJob" data-o="-1"`)}</div>
-  ${S.job !== null && S.job >= 0 ? `<div class="prompt"><span class="lbl">${esc(u.forYou + cc().jobs[S.job][0])}</span><p>${esc(cc().jobs[S.job][1])}</p></div>` : ""}
-  <button class="btn sun wide" data-act="jobDone" ${S.job === null ? "disabled" : ""}>${esc(u.ready)}</button>
-  ${onb ? `<button class="btn alt wide" data-act="jobSkip">${esc(u.skip)}</button>` : ""}</div>`;
+  const top = onb ? `<div class="row"><span class="dots"><i></i><i class="on"></i></span><span class="lbl">${esc(u.stepOf(2, 2))}</span></div>` : `<div class="row"><button class="round" data-act="back" aria-label="${esc(u.back)}">${ic("back")}</button><span></span></div>`;
+  const j = S.job !== null && S.job >= 0 ? cc().jobs[S.job] : null;
+  return `<div class="pg">${top}<h1>${esc(u.jobT)}</h1><p class="sub">${esc(u.jobS)}</p>
+  <div class="chips">${cc().jobs.map((x, ji) => chip(x[0], S.job === ji, `data-act="pickJob" data-o="${ji}"`)).join("")}${chip(u.jobNone, S.job === -1, `data-act="pickJob" data-o="-1"`)}</div>
+  ${j ? `<div class="card" style="background:var(--sc);border-color:var(--coral)"><div class="row"><span class="lbl" style="color:var(--onsc)">${esc(u.sample + " · " + j[0])}</span>${ic("bulb")}</div><p>${esc(j[1])}</p></div>` : ""}
+  <button class="btn wide" data-act="jobDone" ${S.job === null ? "disabled" : ""}>${esc(u.ready)}</button>
+  ${onb ? `<button class="btn out wide" data-act="jobSkip">${esc(u.skip)}</button>` : ""}
+  ${nina(u.jobNina)}</div>`;
 }
+function homeNina() { const u = U(), n = starsN(); return n === 0 ? u.homeNina0 : n >= NL() ? u.homeNinaAll : u.homeNinaN.replace("{n}", n); }
 function pageHome() {
-  const u = U(), L = cc().L, n = starsN();
+  const u = U(), L = cc().L, n = starsN(), r = resumeIdx();
   const hasJob = S.job !== null && S.job >= 0, j = hasJob ? cc().jobs[S.job] : null;
   const tease = hasJob
-    ? `<section class="coral"><span class="lbl" style="color:#17142B">${esc(u.forYou + j[0])}</span><h2>${esc(u.tryNow)}</h2><p>${esc(j[1])}</p><button class="btn" data-act="go" data-p="course" data-tab="work">${esc(u.tryIt)}</button></section>`
-    : `<section class="coral"><h2>${esc(u.teaseT)}</h2><p>${esc(u.teaseB)}</p><button class="btn" data-act="go" data-p="job">${esc(u.teaseBtn)}</button></section>`;
-  return topBar() + `<div class="pg"><section class="hero"><div class="cover">${coverSvg()}<div class="bubs"><div class="bub">${esc(u.bub1)}</div><div class="bub y">${esc(u.bub2)}</div></div></div><h1>${esc(u.homeT)}</h1><p>${esc(u.homeS)}</p>${ctaBtn("sun")}</section>
-  <div class="sp"><b>${esc(u.introLbl)}</b><span class="lbl">${esc(u.done(n, L.length))}</span></div><div class="bar"><i style="width:${n / L.length * 100}%"></i></div>
-  ${L.map((l, i) => `<button class="li ${S.stars[i] ? "done" : ""}" data-act="les" data-i="${i}"><span class="num">${S.stars[i] ? "★" : i + 1}</span><span class="tx"><b>${esc(l.title)}</b><small>${esc(u.mini)} · ${l.task.min} ${esc(u.min)}</small></span><span aria-hidden="true">›</span></button>`).join("")}
-  ${tease}</div>`;
+    ? `<section class="forU"><div class="row"><span class="tag">${esc(u.forYou + j[0])}</span>${ic("bulb", 24)}</div><p style="font-size:17px;line-height:26px">${esc(j[1])}</p><button class="btn white" style="align-self:flex-start" data-act="go" data-p="course" data-tab="work">${esc(u.tryIt)}${ic("fwd")}</button></section>`
+    : `<section class="forU"><h2>${esc(u.teaseT)}</h2><p>${esc(u.teaseB)}</p><button class="btn white" style="align-self:flex-start" data-act="go" data-p="job">${esc(u.teaseBtn)}${ic("fwd")}</button></section>`;
+  return topBar() + `<div class="pg" style="padding-top:4px"><section class="hero"><div class="bub"><span class="ava">${NINA}</span><div class="bb"><span>${esc(u.bub1)}</span><span class="y">${esc(u.bub2)}</span></div></div>
+  <h1>${esc(u.homeT)}</h1><div class="prog"><div class="bar"><i style="width:${n / L.length * 100}%"></i></div><span>${esc(u.ofN(n, L.length))}</span></div>${ctaBtn("sun")}</section>
+  ${nina(homeNina())}${tease}<h2>${esc(u.listT)}</h2>
+  ${L.map((l, i) => { const cls = S.stars[i] ? "done" : (i === r ? "cur" : ""); return `<button class="li ${cls}" data-act="les" data-i="${i}"><span class="num">${S.stars[i] ? ic("star") : i + 1}</span><span class="tx"><b>${esc(l.title)}</b><small>${esc(u.mini)} · ${l.task.min} ${esc(u.min)}</small></span><span class="ch">${S.stars[i] ? ic("checkC") : ic("chev")}</span></button>`; }).join("")}</div>`;
 }
 function pageLesson() {
   const u = U(), i = S.les, l = cc().L[i], total = NL();
@@ -828,63 +941,70 @@ function pageLesson() {
   if (l.illus === "game") ill = `<div class="illu">${gameSvg()}</div>`;
   if (l.illus === "chat") ill = `<div class="illu">${chatSvg()}</div>`;
   if (l.illus === "devices") ill = `<div class="illu">${devSvg()}</div>`;
-  if (l.illus === "tiles") ill = `<div class="tiles"><b style="font-family:var(--hf)">${esc(l.tilesT)}</b><div class="g">${l.tiles.map((t, ti) => `<div>${ico(TICONS[ti])}${esc(t)}</div>`).join("")}</div></div>`;
-  return `<div class="pg"><div class="les-top">${i > 0 ? `<button class="round" data-act="prev" aria-label="${esc(u.prevLes)}" title="${esc(u.prevLes)}">‹</button>` : ""}<span style="flex:none">${esc(u.lesson(i + 1, total))}</span><div class="bar" style="flex:1"><i style="width:${(i + 1) / total * 100}%"></i></div><button class="pillbtn" data-act="go" data-p="home">${esc(u.list)}</button></div>
-  ${ill}${l.kick ? `<span class="badge" style="font-size:14px;padding:4px 12px">${esc(l.kick)}</span>` : ""}<h1>${S.stars[i] ? `<span class="got" aria-label="★">★</span> ` : ""}${esc(l.title)}</h1><p>${esc(l.body)}</p>
-  ${l.chatInfo ? `<section class="box"><h2>${esc(u.chatT)}</h2><div class="illu">${chatSvg2()}</div><p>${esc(u.chatB)}</p><div class="nina">${NINA}<div><b>${esc(u.nina)}:</b> ${esc(u.chatN)}</div></div></section>` : ""}
-  <div id="task">${taskHTML(i)}</div>
-  ${l.tip ? `<div class="tip"><span class="dot">i</span><span>${esc(l.tip)}</span></div>` : ""}
-  <div class="nina">${NINA}<div><b>${esc(u.nina)}:</b> ${esc(l.nina)}</div></div>
-  <div class="two">${i > 0 ? `<button class="btn alt" data-act="prev">‹ ${esc(u.back)}</button>` : ""}<button class="btn" style="flex:1" data-act="next">${esc(i < total - 1 ? u.next : u.toCourse)}</button></div></div>`;
+  if (l.illus === "tiles") ill = `<div class="tiles"><b style="font-family:var(--hf);font-size:17px">${esc(l.tilesT)}</b><div class="g">${l.tiles.map((t, ti) => `<div>${ico(TICONS[ti])}${esc(t)}</div>`).join("")}</div></div>`;
+  const chatInfo = l.chatInfo ? `<section class="chatInfo"><h3 style="display:flex;gap:8px;align-items:center">${ic("chat")}${esc(u.chatT)}</h3><div class="two"><div class="cw"><b>${esc(u.chatA)}</b></div><span class="wall" aria-hidden="true"></span><div class="cw"><b>${esc(u.chatZ)}</b></div></div><p>${esc(u.chatB)}</p>${nina(u.chatN)}</section>` : "";
+  return `<header class="ltop"><div class="r"><button class="round" data-act="${i > 0 ? "prev" : "go"}" data-p="home" aria-label="${esc(i > 0 ? u.prevLes : u.back)}">${ic("back")}</button><b>${esc(u.lesson(i + 1, total))}</b><button class="pillbtn" data-act="go" data-p="home">${esc(u.list)}</button></div><div class="bar"><i style="width:${(i + 1) / total * 100}%"></i></div></header>
+  <div class="pg">${ill}${l.kick ? `<span class="pill y" style="align-self:flex-start">${ic("star", 16)}${esc(l.kick)}</span>` : ""}<h1>${S.stars[i] ? `<span class="got">★</span> ` : ""}${esc(l.title)}</h1><p class="sub" style="font-size:17px;line-height:26px">${esc(l.body)}</p>
+  ${chatInfo}<div id="task" style="display:flex;flex-direction:column;gap:16px">${taskHTML(i)}</div>
+  ${l.tip ? `<div class="tip">${ic("bulb")}<span>${esc(l.tip)}</span></div>` : ""}
+  ${nina(l.nina)}
+  <div class="navb">${i > 0 ? `<button class="btn out" data-act="prev" aria-label="${esc(u.prevLes)}">${ic("back")}</button>` : ""}<button class="btn" data-act="next">${esc(i < total - 1 ? u.next : u.toCourse)}${ic("fwd")}</button></div></div>`;
 }
 function pageCourse() {
-  const u = U(), C2 = cc(), n = starsN(), life = S.tab !== "work";
-  let h = topBar() + `<div class="pg"><section class="hero"><span style="font-size:14px;color:#DDE3FF">${esc(u.courseKick)}</span><h1>${esc(u.courseT)}</h1><div class="stats">${u.st.map(x => `<div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div></section>
-  <div class="box"><div class="sp"><b>${esc(u.introLbl)}</b><span class="lbl">${esc(u.done(n, NL()))}</span></div><div class="bar"><i style="width:${n / NL() * 100}%"></i></div>${ctaBtn("sm alt")}</div>
-  <div class="tabs"><button aria-pressed="${life}" data-act="tab" data-t="life">${esc(u.tabLife)}</button><button aria-pressed="${!life}" data-act="tab" data-t="work">${esc(u.tabWork)}</button></div>`;
+  const u = U(), C2 = cc(), n = starsN(), life = S.tab !== "work", r = resumeIdx();
+  let h = topBar() + `<div class="pg" style="padding-top:4px"><h1>${esc(u.mapT)}</h1>
+  <div class="stats">${u.st.map(x => `<div><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join("")}</div>
+  <div class="seg"><button aria-pressed="${life}" data-act="tab" data-t="life">${esc(u.tabLife)}</button><button aria-pressed="${!life}" data-act="tab" data-t="work">${esc(u.tabWork)}</button></div>`;
   if (life) {
-    h += `<div class="sp" style="align-items:center"><span>${esc(u.lifeDesc)}</span>${S.paid ? `<b class="cnt">${esc(u.owned)}</b>` : `<button class="btn sun sm" data-act="buy" data-k="life">${esc(u.buy)} · $4.99</button>`}</div>`;
+    h += `<button class="intro" data-act="les" data-i="${r < 0 ? 0 : r}" data-resume="${r === S.lastLes ? "1" : ""}"><span class="tx"><span class="tag">${esc(u.free + " · " + (r < 0 ? u.completed : u.inProg))}</span><b>${esc(u.introCard)}</b><small>${esc(u.introMeta)} · ★ ${n}/${NL()}</small></span>${ic(r < 0 ? "checkC" : "play", 28)}</button>`;
     C2.life.forEach((m, mi) => {
       const on = S.open === mi;
-      h += `<div class="mod ${on ? "on" : ""}"><button data-act="mod" data-o="${mi}" aria-expanded="${on}"><span class="num">${mi + 1}</span><span class="tx" style="flex:1"><b style="display:block">${esc(m[0])}</b><small style="color:var(--mute)">15 ${esc(u.min)} · ${m[1].length} ★</small></span><span aria-hidden="true">${S.paid ? "✓" : LOCK}</span></button>${on ? `<ul>${m[1].map(t => `<li>${esc(t)}</li>`).join("")}</ul><div class="st">${esc(S.paid ? u.soon : u.locked)}</div>` : ""}</div>`;
+      h += `<div class="mod ${on ? "on" : ""}"><button data-act="mod" data-o="${mi}" aria-expanded="${on}"><span class="ic">${S.paid ? ic("check") : ic("lock")}</span><span class="tx"><b>${mi + 2}. ${esc(m[0])}</b><small>${esc(u.modMeta(m[1].length))}</small></span>${ic("chev")}</button>${on ? `<ul>${m[1].map(t => `<li>${esc(t)}</li>`).join("")}</ul><div class="st">${esc(S.paid ? u.soon : u.locked)}</div>` : ""}</div>`;
     });
-    h += `<div class="cert ${S.paid ? "" : "lock"}"><span class="lbl">${esc(u.certT)}</span><span class="nm">«${esc(u.certName)}»</span><span>${esc(u.certFor)}: <b>${esc(S.user || u.guest)}</b></span><span class="lbl">${esc(S.paid ? new Date().toLocaleDateString(S.lang) : u.certLocked)}</span></div>`;
+    h += S.paid ? `<span class="pill b" style="align-self:flex-start">${ic("check", 16)}${esc(u.owned)}</span>` : `<button class="btn wide" data-act="buy" data-k="life">${ic("lock")}${esc(u.buy)} · $4.99</button>`;
+    h += `<section class="cert ${S.paid ? "" : "lock"}"><div class="row"><span class="lbl" style="color:var(--ink)">${esc(u.certT)}</span>${ic("cert", 26)}</div><span class="nm">«${esc(u.certName)}»</span><span>${esc(u.certFor)}: <b>${esc(S.user || u.guest)}</b></span><span class="lbl" style="color:var(--ontc)">${esc(S.paid ? new Date().toLocaleDateString(S.lang) : u.certLocked)}</span></section>`;
   } else {
     const ji = jobIdx(), j = C2.jobs[ji];
-    h += `<p>${esc(u.workDesc)}</p><div class="lbl">${esc(u.whatJob)}</div><div class="chips">${C2.jobs.map((x, xi) => chip(x[0], ji === xi, `data-act="job" data-o="${xi}"`)).join("")}</div>
-    <section class="task"><span class="badge">${esc(u.tryNow)}</span><h2>${esc(j[0])}</h2>${promptBox(j[1], "copyJob")}<span class="lbl">${esc(u.inPack + j[2])}</span>
-    ${S.jobs[ji] ? `<b class="cnt" style="white-space:normal">${esc(u.jobOwned)}</b>` : `<button class="btn sun" data-act="buy" data-k="job">${esc(u.buy)} · $0.99</button>`}</section>`;
+    h += `<p class="sub">${esc(u.workDesc)}</p><span class="lbl">${esc(u.whatJob)}</span><div class="chips">${C2.jobs.map((x, xi) => chip(x[0], ji === xi, `data-act="job" data-o="${xi}"`)).join("")}</div>
+    <section class="task"><span class="pill y" style="align-self:flex-start">${ic("bulb", 16)}${esc(u.tryNow)}</span><h2>${esc(j[0])}</h2>${promptBox(j[1], "copyJob")}<span class="lbl">${esc(u.inPack + j[2])}</span>
+    ${S.jobs[ji] ? `<span class="pill b" style="white-space:normal">${ic("check", 16)}${esc(u.jobOwned)}</span>` : `<button class="btn sun wide" data-act="buy" data-k="job">${ic("lock")}${esc(u.buy)} · $0.99</button>`}</section>`;
   }
-  return h + `<div class="nina">${NINA}<div><b>${esc(u.updT)}</b><br>${esc(u.updB)}</div></div></div>`;
+  return h + nina(u.courseNina) + `<div class="card"><b>${esc(u.updT)}</b><span class="sub">${esc(u.updB)}</span></div></div>`;
 }
 function pageProfile() {
-  const u = U(), buys = (S.paid ? 1 : 0) + Object.keys(S.jobs).length;
+  const u = U(), buys = (S.paid ? 1 : 0) + Object.keys(S.jobs).length, n = starsN();
   const jobName = S.job === -1 ? u.jobNone : (S.job !== null && cc().jobs[S.job] ? cc().jobs[S.job][0] : u.noJob);
-  return topBar() + `<div class="pg"><div class="box"><div class="prof"><span class="ava">${esc(S.user ? S.user.trim().charAt(0).toUpperCase() : "?")}</span><div><b style="font-size:18px">${esc(S.user || u.guest)}</b><br><span class="lbl">${esc(S.user ? (S.google ? (S.email || u.signedReal) : u.signedSub) : u.guestSub)}</span></div></div>
-  ${S.user ? `<button class="btn alt sm" data-act="logout">${esc(u.logout)}</button>` : `<button class="btn cob" data-act="login"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>`}</div>
-  <div class="box"><div class="sp" style="align-items:center"><div><b>${esc(u.profJob)}</b><br><span class="lbl">${esc(jobName)}</span></div><button class="btn alt sm" data-act="go" data-p="job">${esc(u.change)}</button></div></div>
-  <div class="box"><b>${esc(u.langT)}</b><div class="chips">${LANGS.map(l => chip(l[1], S.lang === l[0], `data-act="lang" data-l="${l[0]}"`)).join("")}</div></div>
-  <div class="box"><b>${esc(u.statsT)}</b><div class="sp"><span>${esc(u.starsLbl)}</span><b>★ ${starsN()} / ${NL()}</b></div><div class="sp"><span>${esc(u.buysLbl)}</span><b>${buys}</b></div><button class="btn alt sm" data-act="reset">${esc(u.reset)}</button></div>
+  return topBar() + `<div class="pg" style="padding-top:4px"><div class="card"><div class="ucard"><span class="uava">${esc(S.user ? S.user.trim().charAt(0).toUpperCase() : "?")}</span><div><h2>${esc(S.user || u.guest)}</h2><span class="sub">${esc(S.user ? (S.google ? (S.email || u.signedReal) : u.signedSub) : u.guestSub)}</span></div></div></div>
+  ${S.user ? `<button class="btn out wide" data-act="logout">${ic("logout")}${esc(u.logout)}</button>` : `<button class="btn wide" data-act="login"><span class="g" aria-hidden="true">G</span>${esc(u.login)}</button>`}
+  <div class="card" style="background:var(--bg)"><div class="row"><div><span class="lbl">${esc(u.yourJob)}</span><h3>${esc(jobName)}</h3></div><button class="btn tonal sm" data-act="go" data-p="job">${esc(u.change)}</button></div></div>
+  <h3>${esc(u.langT)}</h3><div class="chips">${LANGS.map(l => chip(l[1], S.lang === l[0], `data-act="lang" data-l="${l[0]}"`)).join("")}</div>
+  <h3>${esc(u.progT)}</h3><div class="ptiles"><div><b>${n}</b><span>${esc(u.starsT)}</span></div><div><b>${n} / ${NL()}</b><span>${esc(u.lessonsT)}</span></div><div><b>${buys}</b><span>${esc(u.buysT)}</span></div></div>
+  ${nina(u.profNina.replace("{n}", n))}
+  <button class="link red" data-act="reset">${ic("reset")}${esc(u.reset)}</button>
   <p class="lbl" style="font-weight:400">${esc(u.about)}</p></div>`;
 }
 function renderNav() {
   const show = S.lang && S.onb >= 2 && ["home", "course", "profile"].includes(S.page);
   navEl.hidden = !show; if (!show) return;
   const u = U();
-  navEl.innerHTML = `<div>${[["home", u.navHome], ["course", u.navCourse], ["profile", u.navProfile]].map(x => `<button data-act="tabnav" data-p="${x[0]}" ${S.page === x[0] ? 'aria-current="page"' : ""}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${NAVI[x[0]]}</svg>${esc(x[1])}</button>`).join("")}</div>`;
+  navEl.innerHTML = `<div>${[["home", u.navHome], ["course", u.navCourse], ["profile", u.navProfile]].map(x => `<button data-act="tabnav" data-p="${x[0]}" ${S.page === x[0] ? 'aria-current="page"' : ""}>${ic(x[0], 24)}${esc(x[1])}</button>`).join("")}</div>`;
 }
 function renderSheet() {
   if (!sheet) { sheetEl.innerHTML = ""; return; }
   const u = U();
   let h = "";
-  if (sheet.kind === "login") h = `<h2 id="shT">${esc(u.loginT)}</h2><p>${esc(u.welS)}</p><ol class="how">${u.how.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="lbl" style="font-weight:400">${esc(u.loginHow)} ${esc(u.loginB)}</p><div><label for="lgN">${esc(u.yourName)}</label><input id="lgN" autocomplete="given-name"></div><button class="btn cob wide" data-act="doLogin">${esc(u.loginGo)}</button><button class="btn alt wide" data-act="close">${esc(u.cancel)}</button>`;
+  if (sheet.kind === "login") h = `<span class="handle"></span><h2 id="shT">${esc(u.loginT)}</h2><p class="sub">${esc(u.welS)}</p><ol style="margin:0;padding-inline-start:20px">${u.how.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="lbl" style="font-weight:400">${esc(u.loginHow)} ${esc(u.loginB)}</p><div><label for="lgN">${esc(u.yourName)}</label><input id="lgN" autocomplete="given-name"></div><button class="btn wide" data-act="doLogin">${esc(u.loginGo)}</button><button class="btn out wide" data-act="close">${esc(u.cancel)}</button>`;
   if (sheet.kind === "pay") {
-    const ji = jobIdx(), item = sheet.k === "life" ? u.lifeName : cc().jobs[ji][0] + " — " + u.jobPack, price = sheet.k === "life" ? "$4.99" : "$0.99";
-    h = `<h2 id="shT">${esc(u.payT)}</h2><div class="sp"><b>${esc(item)}</b><b class="price">${price}</b></div><p class="lbl" style="font-weight:400">${esc(u.payB)}</p><button class="btn sun wide" data-act="doPay">${esc(u.payGo)} · ${price}</button><button class="btn alt wide" data-act="close">${esc(u.cancel)}</button>`;
+    const ji = jobIdx(), life = sheet.k === "life", item = life ? u.lifeName : cc().jobs[ji][0] + " — " + u.jobPack, price = life ? "$4.99" : "$0.99";
+    h = `<span class="handle"></span><div class="row" style="align-items:flex-start"><div style="flex:1"><span class="lblc">${esc(u.oneTime)}</span><h2 id="shT">${esc(item)}</h2></div><span class="pricebox price">${price}</span></div>
+    <ul class="checks">${(life ? u.payLife : u.payJob).map(x => `<li>${ic("checkC")}<span>${esc(x)}</span></li>`).join("")}</ul>
+    ${nina(u.payNina)}<p class="lbl" style="font-weight:400">${esc(u.payB)}</p>
+    <button class="btn wide" data-act="doPay">${esc(u.payGo)} · ${price}</button><button class="btn out wide" data-act="close">${esc(u.cancel)}</button>`;
   }
   sheetEl.innerHTML = `<div class="sheet-bg" data-act="bg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">${h}</div></div>`;
   const inp = document.getElementById("lgN"); if (inp) setTimeout(() => inp.focus(), 50);
 }
+
 function render() {
   document.documentElement.lang = S.lang || "ru";
   if (!S.lang) view.innerHTML = pageLang();
